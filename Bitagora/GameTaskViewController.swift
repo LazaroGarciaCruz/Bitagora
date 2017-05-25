@@ -62,12 +62,14 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         
         let totalImagenes = 500
-        let heigth: CGFloat = scanlineView.h / CGFloat(totalImagenes)
+        //let heigth: CGFloat = scanlinesView.h / CGFloat(totalImagenes)
+        let heigth: CGFloat = UIScreen.main.bounds.height / CGFloat(totalImagenes)
         
         var index = 0
         
         for _ in 0...totalImagenes {
-            let imageView = UIImageView(frame: CGRect(x: 0, y: heigth * CGFloat(index), width: scanlineView.w, height: heigth), image: UIImage(named: "scanlines_iphone.png")!)
+            /*let imageView = UIImageView(frame: CGRect(x: 0, y: heigth * CGFloat(index), width: scanlinesView.w, height: heigth), image: UIImage(named: "scanlines_iphone.png")!)*/
+            let imageView = UIImageView(frame: CGRect(x: 0, y: heigth * CGFloat(index), width: UIScreen.main.bounds.width, height: heigth), image: UIImage(named: "scanlines_iphone.png")!)
             imageView.setRotationX(x: 180)
             imageView.contentMode = .scaleAspectFill
             imageView.clipsToBounds = true
@@ -92,7 +94,7 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func actualizarTexto(texto: String, index: Int) {
-        if (index <= listaComponentesTask.count) {
+        if index <= listaComponentesTask.count && listaComponentesTask.count > 0 {
             if listaComponentesTask[index] is TaskComponentText {
                 (listaComponentesTask[index] as! TaskComponentText).texto = texto
             }
@@ -337,9 +339,9 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
                 if (listaComponentesTask[indexPath.row] as! TaskComponentURL).isVideo {
                     return 250
                 }
-                return 80
+                return 90
             case TaskComponentType.counter:
-                return 80
+                return 90
             default:
                 return 150
         }

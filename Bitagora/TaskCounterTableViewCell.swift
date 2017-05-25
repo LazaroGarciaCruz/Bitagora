@@ -20,6 +20,8 @@ class TaskCounterTableViewCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet weak var textoCantidad: UILabel!
     @IBOutlet weak var botonMas: UIButton!
     @IBOutlet weak var botonMenos: UIButton!
+    @IBOutlet weak var backView2: UIView!
+    @IBOutlet weak var backView: UIView!
     
     weak var delegate: TaskCounterTableViewCellDelegate?
     
@@ -42,6 +44,7 @@ class TaskCounterTableViewCell: UITableViewCell, UITextFieldDelegate {
         super.awakeFromNib()
         
         textoDescripcion.delegate = self
+        
         NotificationCenter.default.addObserver(self, selector: #selector(textDidChange(_:)), name: NSNotification.Name.UITextFieldTextDidChange, object: nil)
         
         let panel = UIView(frame: self.frame)
@@ -55,6 +58,9 @@ class TaskCounterTableViewCell: UITableViewCell, UITextFieldDelegate {
         self.sendSubview(toBack: panel)
         
         self.backgroundColor = .clear
+        
+        backView.addBorder(width: 2, color: .white)
+        backView2.addBorder(width: 2, color: .white)
         
     }
 
@@ -88,6 +94,20 @@ class TaskCounterTableViewCell: UITableViewCell, UITextFieldDelegate {
     
     @IBAction func borrarCelda(_ sender: Any) {
         delegate?.borrarElemento(index: (indexPath?.row)!)
+    }
+    
+    /*
+     Con este metodo se limitan el numero de caracteres
+     maximos permitidos para el texto de la descripcion
+     */
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        
+        let maxLength = 50
+        let currentString: NSString = textoDescripcion.text! as NSString
+        let newString: NSString = currentString.replacingCharacters(in: range, with: string) as NSString
+        
+        return newString.length <= maxLength
+        
     }
     
 }

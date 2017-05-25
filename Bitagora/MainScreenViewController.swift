@@ -8,6 +8,7 @@
 
 import UIKit
 import Gifu
+import ImageSlideshow
 
 public enum ScreenTouchPosition : Int {
     
@@ -17,9 +18,9 @@ public enum ScreenTouchPosition : Int {
     
 }
 
-class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate,
+class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate,
                                 UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout,
-                                UITableViewDataSource, UITableViewDelegate {
+                                UITableViewDataSource, UITableViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     //La lista con los distintos juegos que el usuario gestiona
     private var games: Array<Game> = []
@@ -31,12 +32,37 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate,
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tableView: UITableView!
     
+    //Variables para la cabecera del view controller
+    
     @IBOutlet weak var viewScrolling: ScrollingBackgroundView!
     @IBOutlet weak var viewTitulo: RuneTextView!
     @IBOutlet weak var characterLista: GIFImageView!
     @IBOutlet weak var characterSwitch: GIFImageView!
     @IBOutlet weak var characterSpeechLista: GIFImageView!
 
+    //Variables para la creacion de un nuevo juego
+    
+    @IBOutlet weak var textoBotonNuevo: RuneTextView!
+    @IBOutlet weak var gifBotonNuevo: GIFImageView!
+    @IBOutlet weak var viewNuevoJuevo: UIView!
+    @IBOutlet weak var tituloNuevoJuego: UITextField!
+    @IBOutlet weak var botonCoverNuevoJuego: UIButton!
+    @IBOutlet weak var botonLogoNuevoJuego: UIButton!
+    @IBOutlet weak var botonCrearNuevoJuego: UIButton!
+    @IBOutlet weak var coverPortraitMode: UIImageView!
+    @IBOutlet weak var logoPortraitMode: UIImageView!
+    @IBOutlet weak var titlePortraitMode: UILabel!
+    @IBOutlet weak var coverLandscapeMode: UIImageView!
+    @IBOutlet weak var logoLandscapeMode: UIImageView!
+    @IBOutlet weak var titleLandscapeMode: UILabel!
+    
+    let imagePicker = UIImagePickerController()
+    var isBuscandoCover = false
+    var isImagenSeleccionada = false
+    var isTituloSeleccionado = false
+    
+    //Variables de proposito general
+    
     private var lastContentOffset: CGFloat = 0
     private var animate = false
     private var screenTouchPosition: ScreenTouchPosition = .centro
@@ -85,6 +111,7 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate,
         
         if !aplicacionIniciada {
             animarBarraTitulo()
+            animarBotonNuevo()
             aplicacionIniciada = true
         } else {
             viewScrolling.resumeBackground()
@@ -137,6 +164,14 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate,
         collectionView.isHidden = false
         tableView.isHidden = true
         
+        imagePicker.delegate = self
+        tituloNuevoJuego.delegate = self
+        
+        //Estas notificaciones son las que permiten a la vista
+        //saber cuando se va a mostrar el teclado y cuando se oculta
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        
     }
     
     /*
@@ -153,10 +188,34 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate,
         task.difficulty = .hard
         task.priority = .high
     
-        let component = TaskComponentText()
-        component.texto = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque in lacinia eros. Morbi pulvinar orci a leo facilisis, in scelerisque quam sodales. Fusce blandit quam ac sapien gravida lacinia. Nam porttitor nec nibh ac imperdiet. Nulla rutrum imperdiet erat, a laoreet leo convallis quis. Morbi blandit dictum molestie. Vestibulum ex nisl, varius a pellentesque sed, lacinia ut sapien. Fusce eu mi ac odio placerat pulvinar sit amet ac massa. Vivamus bibendum, sapien non molestie blandit, neque purus tincidunt risus, ut finibus tortor augue id nulla. Nam commodo viverra egestas. Nullam neque nunc, feugiat vel volutpat at, dignissim sit amet metus. Fusce commodo maximus aliquam."
+        let componentTexto = TaskComponentText()
+        componentTexto.texto = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque in lacinia eros. Morbi pulvinar orci a leo facilisis, in scelerisque quam sodales. Fusce blandit quam ac sapien gravida lacinia. Nam porttitor nec nibh ac imperdiet. Nulla rutrum imperdiet erat, a laoreet leo convallis quis. Morbi blandit dictum molestie. Vestibulum ex nisl, varius a pellentesque sed, lacinia ut sapien. Fusce eu mi ac odio placerat pulvinar sit amet ac massa. Vivamus bibendum, sapien non molestie blandit, neque purus tincidunt risus, ut finibus tortor augue id nulla. Nam commodo viverra egestas. Nullam neque nunc, feugiat vel volutpat at, dignissim sit amet metus. Fusce commodo maximus aliquam."
+        task.listaComponentesTask.append(componentTexto)
         
-        task.listaComponentesTask.append(component)
+        let componentImages = TaskComponentImages()
+        let listaImagenes = [ImageSource(image: #imageLiteral(resourceName: "img1")), ImageSource(image: #imageLiteral(resourceName: "img2"))]
+        componentImages.listaImagenes = listaImagenes
+        task.listaComponentesTask.append(componentImages)
+        
+        var componentURL = TaskComponentURL()
+        componentURL.isVideo = false
+        componentURL.url = "www.vandal.net"
+        task.listaComponentesTask.append(componentURL)
+        componentURL = TaskComponentURL()
+        componentURL.isVideo = false
+        componentURL.url = "www.google.es"
+        task.listaComponentesTask.append(componentURL)
+        
+        let componentURLYoutube = TaskComponentURL()
+        componentURLYoutube.isVideo = true
+        componentURLYoutube.url = "https://youtu.be/q-H1uDEw1rQ"
+        task.listaComponentesTask.append(componentURLYoutube)
+        
+        let componentContador = TaskComponentCounter()
+        componentContador.maxElements = 10
+        componentContador.currentElementCount = 0
+        componentContador.descripcion = "Total de nucleos ancestrales"
+        task.listaComponentesTask.append(componentContador)
         
         juego1.taskLista.append(task)
         
@@ -387,6 +446,22 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate,
     }
     
     /*
+     Este metodo lleva a cabo las tareas necesarias para animar
+     el boton que permite crear un nuevo juego en el sistema
+     */
+    func animarBotonNuevo() {
+        
+        gifBotonNuevo.animate(withGIFNamed: "navi_low.gif")
+        
+        textoBotonNuevo.texto = "NUEVO JUEGO"
+        textoBotonNuevo.animarTexto()
+        textoBotonNuevo.addTapGesture(tapNumber: 1) { (sender) in
+            self.mostrarPanelNuevoJuego()
+        }
+        
+    }
+    
+    /*
      Este metodo lleva a cabo las tareas necesarias para inicializar
      y gestionar las propiedades de la barra de titulo
     */
@@ -474,6 +549,214 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate,
         let appName: NSString = infoDictionary.object(forKey: "CFBundleName") as! NSString
         viewTitulo.texto = (appName as String).uppercased()
         viewTitulo.animarTexto()
+        
+    }
+    
+    //------------------------------------------------------------------
+    //------------------------------------------------------------------
+    //------------------  METODOS PARA LA CREACION ---------------------
+    //---------------------  DE UN NUEVO JUEGO -------------------------
+    //------------------------------------------------------------------
+    //------------------------------------------------------------------
+    
+    func mostrarPanelNuevoJuego() {
+        
+        //Preparamos los componentes de la vista
+        
+        botonCoverNuevoJuego.addBorder(width: 0.5, color: .lightGray)
+        botonLogoNuevoJuego.addBorder(width: 0.5, color: .lightGray)
+        botonCrearNuevoJuego.addBorder(width: 0.5, color: .lightGray)
+        desactivarBotonCrearNuevoJuego()
+        
+        coverPortraitMode.image = nil
+        coverLandscapeMode.image = nil
+        logoPortraitMode.image = nil
+        logoLandscapeMode.image = nil
+        titlePortraitMode.text = ""
+        titleLandscapeMode.text = ""
+        tituloNuevoJuego.text = ""
+        
+        isBuscandoCover = false
+        isImagenSeleccionada = false
+        isTituloSeleccionado = false
+        
+        //Preparamos y lanzamos la animcacion que muestra la vista
+        
+        let panelFondo = UIView(frame: self.view.frame)
+        panelFondo.backgroundColor = .black
+        panelFondo.alpha = 0
+        panelFondo.tag = 100
+        
+        self.view.addSubview(panelFondo)
+        self.view.bringSubview(toFront: panelFondo)
+        self.view.bringSubview(toFront: viewNuevoJuevo)
+        
+        viewNuevoJuevo.isHidden = false
+        viewNuevoJuevo.alpha = 0
+        viewNuevoJuevo.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        
+        UIView.animate(withDuration: 0.25) {
+            panelFondo.alpha = 0.6
+            self.viewNuevoJuevo.transform = CGAffineTransform.identity
+            self.viewNuevoJuevo.alpha = 1
+        }
+        
+    }
+    
+    @IBAction func ocultarPanelNuevoJuego(_ sender: Any) {
+        
+        for subview in self.view.subviews {
+            if subview.tag == 100 {
+                UIView.animate(withDuration: 0.25, animations: { 
+                    subview.alpha = 0
+                    self.viewNuevoJuevo.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+                    self.viewNuevoJuevo.alpha = 0
+                }, completion: { (exito) in
+                    subview.removeFromSuperview()
+                })
+            }
+        }
+        
+    }
+    
+    @IBAction func seleccionarCover(_ sender: Any) {
+        
+        imagePicker.allowsEditing = false
+        imagePicker.sourceType = .photoLibrary
+        imagePicker.mediaTypes = UIImagePickerController.availableMediaTypes(for: .photoLibrary)!
+        isBuscandoCover = true
+        
+        self.present(imagePicker, animated: true, completion: nil)
+        
+    }
+    
+    @IBAction func seleccionarLogo(_ sender: Any) {
+        
+        imagePicker.allowsEditing = false
+        imagePicker.sourceType = .photoLibrary
+        imagePicker.mediaTypes = UIImagePickerController.availableMediaTypes(for: .photoLibrary)!
+        isBuscandoCover = false
+        
+        self.present(imagePicker, animated: true, completion: nil)
+        
+    }
+    
+    @IBAction func crearNuevoJuego(_ sender: Any) {
+        
+        ocultarPanelNuevoJuego(sender)
+        
+    }
+    
+    func activarBotonCrearNuevoJuego() {
+        
+        botonCrearNuevoJuego.isEnabled = true
+        botonCrearNuevoJuego.backgroundColor = UIColor(red: 230/255, green: 230/255, blue: 230/255, alpha: 255/255)
+        botonCrearNuevoJuego.setTitleColor(.black, for: .normal)
+        
+    }
+    
+    func desactivarBotonCrearNuevoJuego() {
+        
+        botonCrearNuevoJuego.isEnabled = false
+        botonCrearNuevoJuego.backgroundColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 255/255)
+        botonCrearNuevoJuego.setTitleColor(.darkGray, for: .normal)
+        
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        
+        let chosenImage = info[UIImagePickerControllerOriginalImage] as! UIImage
+        
+        if isBuscandoCover {
+            coverPortraitMode.image = chosenImage
+            coverLandscapeMode.image = chosenImage
+        } else {
+            logoPortraitMode.image = chosenImage
+            logoLandscapeMode.image = chosenImage
+        }
+        
+        isImagenSeleccionada = true
+        activarBotonCrearNuevoJuego()
+        
+        self.dismiss(animated:true, completion: nil)
+        
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    //------------------------------------------------------------------
+    //------------------------------------------------------------------
+    //--------------------  METODOS DEL KEYBOARD -----------------------
+    //------------------------------------------------------------------
+    //------------------------------------------------------------------
+    
+    /*
+     Con este metodo se especifica que hacer cuando
+     se muestra el teclado al iniciar la edicion de texto
+     */
+    func keyboardWillShow(notification: NSNotification) {
+        
+        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+            if self.view.frame.origin.y == 0 {
+                self.view.frame.origin.y -= keyboardSize.height
+            }
+        }
+        
+    }
+    
+    /*
+     Con este metodo se especifica que hacer cuando
+     se oculta el teclado al iniciar la edicion de texto
+     */
+    func keyboardWillHide(notification: NSNotification) {
+        
+        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+            if self.view.frame.origin.y != 0 {
+                self.view.frame.origin.y += keyboardSize.height
+            }
+        }
+        
+    }
+    
+    /*
+     Con este metodo se especifica que se debe hacer cuando
+     se pulsa return cuando un textfield esta activo
+     */
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        
+        self.view.endEditing(true)
+        
+        if (tituloNuevoJuego.text?.characters.count)! > 0 {
+            titlePortraitMode.text = tituloNuevoJuego.text
+            titleLandscapeMode.text = tituloNuevoJuego.text
+            isTituloSeleccionado = true
+            activarBotonCrearNuevoJuego()
+        } else {
+            titlePortraitMode.text = ""
+            titleLandscapeMode.text = ""
+            isTituloSeleccionado = false
+            if !isImagenSeleccionada {
+                desactivarBotonCrearNuevoJuego()
+            }
+        }
+        
+        return false
+        
+    }
+    
+    /*
+     Con este metodo se limitan el numero de caracteres
+     maximos permitidos para el texto del titulo
+     */
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        
+        let maxLength = 50
+        let currentString: NSString = tituloNuevoJuego.text! as NSString
+        let newString: NSString = currentString.replacingCharacters(in: range, with: string) as NSString
+        
+        return newString.length <= maxLength
         
     }
     

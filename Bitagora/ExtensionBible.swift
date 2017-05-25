@@ -15,7 +15,22 @@ import ObjectiveC
 
 // let APPDELEGATE: AppDelegate = UIApplication.sharedApplication().delegate as AppDelegate
 
+// MARK: - UITextField
 
+extension UITextField{
+    
+    @IBInspectable var placeHolderColor: UIColor? {
+        
+        get {
+            return self.placeHolderColor
+        }
+        set {
+            self.attributedPlaceholder = NSAttributedString(string:self.placeholder != nil ? self.placeholder! : "", attributes:[NSForegroundColorAttributeName: newValue!])
+        }
+        
+    }
+    
+}
 
 // MARK: - UIBarItem extension -
 

@@ -18,6 +18,8 @@ protocol TaskTextoTableViewCellDelegate: class {
 class TaskTextoTableViewCell: UITableViewCell, UITextViewDelegate {
 
     @IBOutlet weak var textView: UITextView!
+    @IBOutlet weak var backView: UIView!
+    @IBOutlet weak var backView2: UIView!
     
     weak var delegate: TaskTextoTableViewCellDelegate?
     
@@ -50,6 +52,10 @@ class TaskTextoTableViewCell: UITableViewCell, UITextViewDelegate {
         self.sendSubview(toBack: panel)
         
         self.backgroundColor = .clear
+        
+        textView.addBorder(width: 1, color: UIColor(red: 0/255, green: 0/255, blue: 173/255, alpha: 255/255))
+        backView.addBorder(width: 2, color: .white)
+        backView2.addBorder(width: 2, color: .white)
         
     }
     

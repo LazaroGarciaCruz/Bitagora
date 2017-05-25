@@ -9,7 +9,7 @@
 import UIKit
 import Gifu
 
-class GameTaskDetailViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class GameTaskDetailViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TaskCounterDetailTableViewCellDelegate {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var scanlinesView: UIView!
@@ -39,12 +39,14 @@ class GameTaskDetailViewController: UIViewController, UITableViewDataSource, UIT
         }
         
         let totalImagenes = 500
-        let heigth: CGFloat = scanlinesView.h / CGFloat(totalImagenes)
+        //let heigth: CGFloat = scanlinesView.h / CGFloat(totalImagenes)
+        let heigth: CGFloat = UIScreen.main.bounds.height / CGFloat(totalImagenes)
         
         var index = 0
         
         for _ in 0...totalImagenes {
-            let imageView = UIImageView(frame: CGRect(x: 0, y: heigth * CGFloat(index), width: scanlinesView.w, height: heigth), image: UIImage(named: "scanlines_iphone.png")!)
+            /*let imageView = UIImageView(frame: CGRect(x: 0, y: heigth * CGFloat(index), width: scanlinesView.w, height: heigth), image: UIImage(named: "scanlines_iphone.png")!)*/
+            let imageView = UIImageView(frame: CGRect(x: 0, y: heigth * CGFloat(index), width: UIScreen.main.bounds.width, height: heigth), image: UIImage(named: "scanlines_iphone.png")!)
             imageView.setRotationX(x: 180)
             imageView.contentMode = .scaleAspectFill
             imageView.clipsToBounds = true
@@ -53,6 +55,12 @@ class GameTaskDetailViewController: UIViewController, UITableViewDataSource, UIT
             index += 1
         }
         
+    }
+    
+    func actualizarContador(actualElements: Int, index: Int) {
+        if taskSeleccionada.listaComponentesTask[index] is TaskComponentCounter {
+            (taskSeleccionada.listaComponentesTask[index] as! TaskComponentCounter).currentElementCount = actualElements
+        }
     }
     
     @IBAction func volverPantallaJuego(_ sender: Any) {
@@ -123,8 +131,6 @@ class GameTaskDetailViewController: UIViewController, UITableViewDataSource, UIT
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellTexto", for: indexPath) as! TaskTextoDetailTableViewCell
         cell.texto = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentText).texto
-        //cell.indexPath = indexPath
-        //cell.inicializarComponentes()
         
         return cell
         
@@ -133,9 +139,8 @@ class GameTaskDetailViewController: UIViewController, UITableViewDataSource, UIT
     func procesarTaskImagenesCell(indexPath: IndexPath) -> TaskImagenesDetailTableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellImagenes", for: indexPath) as! TaskImagenesDetailTableViewCell
-        /*cell.localSource = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentImages).listaImagenes
-        cell.indexPath = indexPath
-        cell.inicializarImageSlideshow()*/
+        cell.localSource = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentImages).listaImagenes
+        cell.inicializarImageSlideshow()
         
         return cell
         
@@ -144,10 +149,9 @@ class GameTaskDetailViewController: UIViewController, UITableViewDataSource, UIT
     func procesarTaskURLCell(indexPath: IndexPath) -> TaskURLDetailTableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellURL", for: indexPath) as! TaskURLDetailTableViewCell
-        /*cell.textoURL = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentURL).url
+        cell.textoURL = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentURL).url
         cell.isVideo = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentURL).isVideo
-        cell.indexPath = indexPath
-        cell.inicializarComponentes()*/
+        cell.inicializarComponentes()
         
         return cell
         
@@ -156,9 +160,11 @@ class GameTaskDetailViewController: UIViewController, UITableViewDataSource, UIT
     func procesarTaskCounterCell(indexPath: IndexPath) -> TaskCounterTDetailableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellContador", for: indexPath) as! TaskCounterTDetailableViewCell
-        /*cell.descripcion = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentCounter).descripcion
-        cell.maxElements = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentCounter).maxElements
-        cell.indexPath = indexPath*/
+        cell.textoDescripcion.text = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentCounter).descripcion
+        cell.cantidadTotal = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentCounter).maxElements
+        cell.cantidadActual = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentCounter).currentElementCount
+        cell.indexPath = indexPath
+        cell.delegate = self
         
         return cell
         
@@ -177,9 +183,9 @@ class GameTaskDetailViewController: UIViewController, UITableViewDataSource, UIT
             if (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentURL).isVideo {
                 return 250
             }
-            return 80
+            return 20
         case TaskComponentType.counter:
-            return 80
+            return 40
         default:
             return 150
         }
