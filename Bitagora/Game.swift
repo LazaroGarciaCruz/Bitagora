@@ -16,15 +16,8 @@ import UIKit
 public class Game {
     
     var title: String = ""
-    var genre: String = ""
-    var year: String = ""
-    var platform: Array<String> = []
-    var publisher: String = ""
-    
     var logoImage: UIImage?
     var coverImage: UIImage?
-    var gameplayImages: Array<UIImage> = []
-    
     var taskLista: Array<GameTask> = []
     
     init(title: String) {

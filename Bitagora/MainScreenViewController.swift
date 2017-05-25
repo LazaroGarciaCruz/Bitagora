@@ -24,10 +24,6 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
     
     //La lista con los distintos juegos que el usuario gestiona
     private var games: Array<Game> = []
-    
-    public var isIphone = false
-    private var needRelaod = true
-    private var aplicacionIniciada = false
 
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tableView: UITableView!
@@ -61,8 +57,19 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
     var isImagenSeleccionada = false
     var isTituloSeleccionado = false
     
+    var nuevoJuegoTitulo = ""
+    var nuevoJuegoCoverImage: UIImage?
+    var nuevoJuegoLogoImage: UIImage?
+    
+    //Variables para la gestion de datos
+    
+    var dataManager = DataMaganer.sharedInstance
+    
     //Variables de proposito general
     
+    public var isIphone = false
+    private var needRelaod = true
+    private var aplicacionIniciada = false
     private var lastContentOffset: CGFloat = 0
     private var animate = false
     private var screenTouchPosition: ScreenTouchPosition = .centro
@@ -180,7 +187,7 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
      */
     func cargarJuegos() {
         
-        let juego1 = Game(title: "The Legend of Zelda: Breath of the wild")
+        /*let juego1 = Game(title: "The Legend of Zelda: Breath of the wild")
         juego1.logoImage = UIImage(named: "ZeldaLogo")
         juego1.coverImage = UIImage(named: "ZeldaBackground")
         
@@ -284,7 +291,7 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         games.append(juego4)
         games.append(juego3)
         games.append(juego2)
-        games.append(juego4)
+        games.append(juego4)*/
         
     }
     
@@ -575,6 +582,14 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         titlePortraitMode.text = ""
         titleLandscapeMode.text = ""
         tituloNuevoJuego.text = ""
+        titlePortraitMode.textColor = .black
+        titlePortraitMode.shadowColor = .clear
+        titleLandscapeMode.textColor = .black
+        titleLandscapeMode.shadowColor = .clear
+        
+        nuevoJuegoTitulo = ""
+        nuevoJuegoCoverImage = nil
+        nuevoJuegoLogoImage = nil
         
         isBuscandoCover = false
         isImagenSeleccionada = false
@@ -645,6 +660,8 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         
         ocultarPanelNuevoJuego(sender)
         
+        DataMaganer.sharedInstance.guardarJuego(titulo: nuevoJuegoTitulo, coverImage: nuevoJuegoCoverImage, logoImage: nuevoJuegoLogoImage)
+        
     }
     
     func activarBotonCrearNuevoJuego() {
@@ -668,11 +685,29 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         let chosenImage = info[UIImagePickerControllerOriginalImage] as! UIImage
         
         if isBuscandoCover {
+            
+            nuevoJuegoCoverImage = chosenImage
             coverPortraitMode.image = chosenImage
             coverLandscapeMode.image = chosenImage
+            
+            if !isImagenSeleccionada {
+                titlePortraitMode.textColor = .white
+                titlePortraitMode.shadowColor = .black
+                titleLandscapeMode.textColor = .white
+                titleLandscapeMode.shadowColor = .black
+            }
+            
         } else {
+            
+            nuevoJuegoLogoImage = chosenImage
             logoPortraitMode.image = chosenImage
             logoLandscapeMode.image = chosenImage
+            
+            titlePortraitMode.textColor = .clear
+            titlePortraitMode.shadowColor = .clear
+            titleLandscapeMode.textColor = .clear
+            titleLandscapeMode.shadowColor = .clear
+            
         }
         
         isImagenSeleccionada = true
@@ -731,6 +766,10 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         if (tituloNuevoJuego.text?.characters.count)! > 0 {
             titlePortraitMode.text = tituloNuevoJuego.text
             titleLandscapeMode.text = tituloNuevoJuego.text
+            titlePortraitMode.textColor = .black
+            titlePortraitMode.shadowColor = .clear
+            titleLandscapeMode.textColor = .black
+            titleLandscapeMode.shadowColor = .clear
             isTituloSeleccionado = true
             activarBotonCrearNuevoJuego()
         } else {
@@ -741,6 +780,8 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
                 desactivarBotonCrearNuevoJuego()
             }
         }
+        
+        nuevoJuegoTitulo = tituloNuevoJuego.text!
         
         return false
         

@@ -13,6 +13,8 @@
 		5D381DEA1EC2F20500FE979C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D381DE91EC2F20500FE979C /* AppDelegate.swift */; };
 		5D381DEC1EC2F20500FE979C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D381DEB1EC2F20500FE979C /* ViewController.swift */; };
 		5D381DF41EC2F20500FE979C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5D381DF21EC2F20500FE979C /* LaunchScreen.storyboard */; };
+		5D5AB18B1ED6D64D0018F4DB /* bitagora_data.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D5AB18A1ED6D64D0018F4DB /* bitagora_data.json */; };
+		5D5AB18D1ED6D6770018F4DB /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5AB18C1ED6D6770018F4DB /* DataManager.swift */; };
 		5D690F231EC2F42100039E2C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5D690F221EC2F42100039E2C /* Main.storyboard */; };
 		5D690F2E1EC2F43A00039E2C /* orc_attack.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5D690F241EC2F43A00039E2C /* orc_attack.gif */; };
 		5D690F2F1EC2F43A00039E2C /* orc_attack_reverse.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5D690F251EC2F43A00039E2C /* orc_attack_reverse.gif */; };
@@ -137,6 +139,8 @@
 		5D381DEB1EC2F20500FE979C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		5D381DF31EC2F20500FE979C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5D381DF51EC2F20500FE979C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5D5AB18A1ED6D64D0018F4DB /* bitagora_data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = bitagora_data.json; sourceTree = "<group>"; };
+		5D5AB18C1ED6D6770018F4DB /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		5D690F221EC2F42100039E2C /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		5D690F241EC2F43A00039E2C /* orc_attack.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = orc_attack.gif; sourceTree = "<group>"; };
 		5D690F251EC2F43A00039E2C /* orc_attack_reverse.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = orc_attack_reverse.gif; sourceTree = "<group>"; };
@@ -309,6 +313,7 @@
 				5D381DEB1EC2F20500FE979C /* ViewController.swift */,
 				5D381DF21EC2F20500FE979C /* LaunchScreen.storyboard */,
 				5D690F221EC2F42100039E2C /* Main.storyboard */,
+				5D5AB18A1ED6D64D0018F4DB /* bitagora_data.json */,
 				5DAC19731ECAD5CB0075285A /* Assets.xcassets */,
 				5D381DF51EC2F20500FE979C /* Info.plist */,
 			);
@@ -503,6 +508,7 @@
 				5DAC19AF1ECDB2990075285A /* TaskComponentImages.swift */,
 				5DAC19B11ECDB2B00075285A /* TaskComponentURL.swift */,
 				5D34024C1ECDE81100813D6B /* TaskComponentCounter.swift */,
+				5D5AB18C1ED6D6770018F4DB /* DataManager.swift */,
 			);
 			name = Modelo;
 			sourceTree = "<group>";
@@ -682,6 +688,7 @@
 				5D69102F1EC2F4BF00039E2C /* ZeldaLogo.png in Resources */,
 				5D6910311EC2F4BF00039E2C /* ZeldaBackground.png in Resources */,
 				5DDAF30B1EC785A60011E743 /* steampunk_character2.gif in Resources */,
+				5D5AB18B1ED6D64D0018F4DB /* bitagora_data.json in Resources */,
 				5D6910321EC2F4BF00039E2C /* ZeldaLogoOriginal.png in Resources */,
 				5DDAF2EA1EC4AF230011E743 /* explosion_smoke.gif in Resources */,
 				5D80DCE61EC8E1420050A49B /* scanlines2.png in Resources */,
@@ -777,6 +784,7 @@
 				5DAC19B21ECDB2B00075285A /* TaskComponentURL.swift in Sources */,
 				5DE7EC321ED44A9600647F47 /* TaskCounterTDetailableViewCell.swift in Sources */,
 				5DAC19AA1ECDA7810075285A /* YouTube.swift in Sources */,
+				5D5AB18D1ED6D6770018F4DB /* DataManager.swift in Sources */,
 				5DAC198C1ECB4A2F0075285A /* FileManager+Persistence.swift in Sources */,
 				5D381DEA1EC2F20500FE979C /* AppDelegate.swift in Sources */,
 				5DAC9E7B1EC304C7003B36CA /* GameScreenViewController.swift in Sources */,

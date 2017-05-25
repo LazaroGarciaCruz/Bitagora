@@ -35,6 +35,9 @@ class GameScreenViewController: UIViewController, UITableViewDataSource, UITable
     //Esta variable contiene la informacion del juego seleccionado
     var juegoSeleccionado: Game!
     var listaTask: Array<GameTask> = []
+    
+    //Variables para la gestion de datos
+    var dataManager = DataMaganer.sharedInstance
 
     //Variables para la gestion de la tabla de tareas
     @IBOutlet weak var tableView: UITableView!
