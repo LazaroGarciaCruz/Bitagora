@@ -44,8 +44,8 @@ class RuneTextView: UIView {
         var index = 0
         var animacionesFinalizadas = 0
         
-        let tiempoAnimacionRapida = 0.05
-        let delayAnimacionRapida = 0.01
+        let tiempoAnimacionRapida = 0.1
+        let delayAnimacionRapida = 0.025
         let tiempoAnimacionLenta = 0.35
         let delayAnimacionLenta = 0.15
         
@@ -117,11 +117,13 @@ class RuneTextView: UIView {
         }
         
     }
-
     
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    /*override func draw(_ rect: CGRect) {
-    }*/
+    func borrarTexto() {
+        
+        for subview in subviews {
+            subview.removeFromSuperview()
+        }
+        
+    }
 
 }

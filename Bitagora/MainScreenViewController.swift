@@ -20,7 +20,8 @@ public enum ScreenTouchPosition : Int {
 
 class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate,
                                 UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout,
-                                UITableViewDataSource, UITableViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+                                UITableViewDataSource, UITableViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate,
+                                GameCollectionViewCellDelegate, GameTableViewCellDelegate {
     
     //La lista con los distintos juegos que el usuario gestiona
     private var games: Array<Game> = []
@@ -160,10 +161,12 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
     func inicializarViewControler() {
         
         //Cambiamos el color de fondo de la status
+        
         let colores: Array<CGColor> = [UIColor(red: 144/255, green: 42/255, blue: 135/255, alpha: 1).cgColor,
                                        UIColor(red: 252/255, green: 2/255, blue: 84/255, alpha: 1).cgColor]
         
         //Propiedades del status bar
+        
         let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
         statusBarView.createGradientWithColors(colors: colores, direction: .horizontal)
         view.addSubview(statusBarView)
@@ -176,8 +179,41 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         
         //Estas notificaciones son las que permiten a la vista
         //saber cuando se va a mostrar el teclado y cuando se oculta
+        
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        
+        //Se le añade el control para borrar de elementos
+        
+        collectionView.addLongPressGesture { (sender) in
+            
+            if sender.state != UIGestureRecognizerState.ended {
+                return
+            }
+            
+            let p = sender.location(in: self.collectionView)
+            let indexPath = self.collectionView.indexPathForItem(at: p)
+            
+            if let index = indexPath {
+                (self.collectionView.cellForItem(at: index) as! GameCollectionViewCell).animacionBorrado()
+            }
+            
+        }
+        
+        tableView.addLongPressGesture { (sender) in
+            
+            if sender.state != UIGestureRecognizerState.ended {
+                return
+            }
+            
+            let p = sender.location(in: self.tableView)
+            let indexPath = self.tableView.indexPathForRow(at: p)
+            
+            if let index = indexPath {
+                (self.tableView.cellForRow(at: index) as! GameTableViewCell).animacionBorrado()
+            }
+            
+        }
         
     }
     
@@ -186,6 +222,8 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
      para cargar la lista de juegos que gestiona el usuario
      */
     func cargarJuegos() {
+        
+        games = DataMaganer.sharedInstance.cargarListaDatos()
         
         /*let juego1 = Game(title: "The Legend of Zelda: Breath of the wild")
         juego1.logoImage = UIImage(named: "ZeldaLogo")
@@ -659,8 +697,10 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
     @IBAction func crearNuevoJuego(_ sender: Any) {
         
         ocultarPanelNuevoJuego(sender)
+        games.append(DataMaganer.sharedInstance.guardarJuego(titulo: nuevoJuegoTitulo, coverImage: nuevoJuegoCoverImage, logoImage: nuevoJuegoLogoImage))
         
-        DataMaganer.sharedInstance.guardarJuego(titulo: nuevoJuegoTitulo, coverImage: nuevoJuegoCoverImage, logoImage: nuevoJuegoLogoImage)
+        tableView.reloadData()
+        collectionView.reloadData()
         
     }
     
@@ -753,6 +793,36 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
             }
         }
         
+    }
+    
+    /*
+     Con este metodo se especifica que se debe hacer cuando
+     un textfield esta activo pierde el foco
+     */
+    func textFieldDidEndEditing(_ textField: UITextField, reason: UITextFieldDidEndEditingReason) {
+        
+        self.view.endEditing(true)
+        
+        if (tituloNuevoJuego.text?.characters.count)! > 0 {
+            titlePortraitMode.text = tituloNuevoJuego.text
+            titleLandscapeMode.text = tituloNuevoJuego.text
+            titlePortraitMode.textColor = .black
+            titlePortraitMode.shadowColor = .clear
+            titleLandscapeMode.textColor = .black
+            titleLandscapeMode.shadowColor = .clear
+            isTituloSeleccionado = true
+            activarBotonCrearNuevoJuego()
+        } else {
+            titlePortraitMode.text = ""
+            titleLandscapeMode.text = ""
+            isTituloSeleccionado = false
+            if !isImagenSeleccionada {
+                desactivarBotonCrearNuevoJuego()
+            }
+        }
+        
+        nuevoJuegoTitulo = tituloNuevoJuego.text!
+
     }
     
     /*
@@ -864,6 +934,9 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         let juego = games[indexPath.row]
         cell.logoImage.image = juego.logoImage
         cell.backgroundImage.image = juego.coverImage
+        cell.titleText.text = juego.title
+        cell.indexPath = indexPath
+        cell.delegate = self
         cell.prepararCelda()
         cell.animacionScroll(offset: 0, posicion: .centro)
         cell.selectionStyle = .none
@@ -980,6 +1053,9 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         let juego = games[indexPath.row]
         cell.logoImage.image = juego.logoImage
         cell.backgroundImage.image = juego.coverImage
+        cell.titleText.text = juego.title
+        cell.indexPath = indexPath
+        cell.delegate = self
         cell.prepararCelda()
         cell.animacionScroll(offset: 0, posicion: .centro)
         
@@ -1044,6 +1120,26 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         
         //return CGSize(width: width, height: (width*16)/9 - (heightTolerance*16/9))
         return CGSize(width: width, height: (width*255)/180)
+        
+    }
+    
+    /*
+     Este metodo lleva a cabo las tareas necesarias para
+     el borrado de una celda del collection view
+     */
+    func borrarCelda(index: Int) {
+        
+        if (DataMaganer.sharedInstance.borrarJuego(id: games[index].id)) {
+            if let cell = self.collectionView.cellForItem(at: IndexPath(row: index, section: 0)) {
+                 (cell as! GameCollectionViewCell).cancelarBorrado()
+            }
+            if let cell = self.tableView.cellForRow(at: IndexPath(row: index, section: 0)) {
+                (cell as! GameTableViewCell).cancelarBorrado()
+            }
+            games.remove(at: index)
+            tableView.reloadData()
+            collectionView.reloadData()
+        }
         
     }
     

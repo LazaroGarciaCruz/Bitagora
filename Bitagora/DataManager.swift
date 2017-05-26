@@ -27,6 +27,10 @@ class DataMaganer {
     //del fichero json cuando se inicia la aplicacion
     var json: JSON? = nil
     
+    //-----------------------------------------------------------------
+    //---------- FUNCIONES SOBRE LA CARGA DE LA APLICACION ------------
+    //-----------------------------------------------------------------
+    
     /*
      Esta clase se encanrga de determinar si en directorio
      de Documentos en la instalacion de la aplicacion se 
@@ -67,9 +71,37 @@ class DataMaganer {
         
     }
     
+    /*
+     Este metodo devuelve la informacion guardada en el fichero JSON
+     estructurada en la lista de juegos, tareas y subtareas que se
+     utilizan en el uso de la aplicacion
+     */
+    public func cargarListaDatos() -> Array<Game> {
+        
+        var listaDatos: Array<Game> = []
+        
+        //Procesamos el JSON para sacar la lista general de juegos y sus propiedades
+        if (json?["juegos"].exists())! {
+            for (_, value):(String, JSON) in (json?["juegos"])! {
+                listaDatos.append(Game(attributes: value.dictionary!)!)
+            }
+        }
+        
+        return listaDatos
+        
+    }
+    
+    //-----------------------------------------------------------------
+    //---------------- FUNCIONES SOBRE LOS JUEGOS ---------------------
+    //-----------------------------------------------------------------
+    
+    /*
+     Este metodo lleva a cabo las tareas necesarias para almacenar 
+     un nuevo juego en el sistema de archivos del JSON
+     */
     public func guardarJuego(titulo: String, coverImage: UIImage?, logoImage: UIImage?) -> Game {
         
-        let tituloFinal = /*titulo.components(separatedBy: " ")[0] + "_" + */randomString(length: 10)
+        let tituloFinal = randomString(length: 10).uppercased()
         var rutaCover = ""
         var rutaLogo = ""
         
@@ -105,10 +137,13 @@ class DataMaganer {
             
             if (json?["juegos"].exists())! {
 
-                let update: JSON = JSON(["juegos": [["id": tituloFinal, "titulo": titulo, "cover": rutaCover, "logo": rutaLogo]]])
+                let newData: JSON = (["id": tituloFinal, "titulo": titulo, "cover": rutaCover, "logo": rutaLogo])
+                let update: JSON = JSON(["juegos": [newData]])
                 try json?.merge(with: update)
 
                 guardarEnDisco()
+                
+                return Game(attributes: newData.dictionary!)!
                 
             }
             
@@ -116,9 +151,42 @@ class DataMaganer {
             print("Error: \(error.debugDescription)")
         }
         
-        return Game(title: tituloFinal)
+        return Game()
         
     }
+    
+    /*
+     Este metodo lleva a cabo las tareas necesarias para borrar un
+     juego de la lista de juegos almacenada en un JSON asi como
+     sus tareas asociadas y las subtareas
+     */
+    func borrarJuego(id: String) -> Bool {
+        
+        if FileManager.deleteDataFromDocumentsDirectory(relativePath: id) {
+        
+            if (json?["juegos"].exists())! {
+                
+                for (key, value):(String, JSON) in (json?["juegos"])! {
+                    if value["id"].string == id {
+                        json?["juegos"].arrayObject?.remove(at: Int(key)!)
+                    }
+                }
+                
+                guardarEnDisco()
+                
+                return true
+                
+            }
+            
+        }
+        
+        return false
+        
+    }
+    
+    //-----------------------------------------------------------------
+    //-------------------- FUNCIONES GENERALES ------------------------
+    //-----------------------------------------------------------------
     
     /*
      Este metodo guarda en disco los cambios efectuados en un JSON
@@ -132,6 +200,16 @@ class DataMaganer {
             print(error.localizedDescription)
         }
     
+    }
+    
+    /*
+     Este metodo devuelve una imagen almacenada en disco si existe
+     */
+    func cargarImagenAlmacenada(directorio: String, imagen: String) -> UIImage? {
+        
+        let rutaImagen = FileManager.documentsDirectoryURL().appendingPathComponent(directorio).appendingPathComponent(imagen)
+        return UIImage(contentsOfFile: rutaImagen.path)
+        
     }
     
     /*
