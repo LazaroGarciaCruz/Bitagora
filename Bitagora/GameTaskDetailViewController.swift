@@ -60,6 +60,8 @@ class GameTaskDetailViewController: UIViewController, UITableViewDataSource, UIT
     func actualizarContador(actualElements: Int, index: Int) {
         if taskSeleccionada.listaComponentesTask[index] is TaskComponentCounter {
             (taskSeleccionada.listaComponentesTask[index] as! TaskComponentCounter).currentElementCount = actualElements
+            DataMaganer.sharedInstance.actualizarContadorTask(
+                id: taskSeleccionada.id, taskComponente: taskSeleccionada.listaComponentesTask[index] as! TaskComponentCounter)
         }
     }
     
@@ -139,7 +141,7 @@ class GameTaskDetailViewController: UIViewController, UITableViewDataSource, UIT
     func procesarTaskImagenesCell(indexPath: IndexPath) -> TaskImagenesDetailTableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellImagenes", for: indexPath) as! TaskImagenesDetailTableViewCell
-        cell.localSource = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentImages).listaImagenes
+        cell.listaImagenes = (taskSeleccionada.listaComponentesTask[indexPath.row] as! TaskComponentImages).listaImagenes
         cell.inicializarImageSlideshow()
         
         return cell

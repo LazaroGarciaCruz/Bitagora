@@ -28,7 +28,13 @@ public class TaskComponent {
 
     var type: TaskComponentType = .none
     
-    init() {
+    init() {}
+    
+    init(type: TaskComponentType) {
+        self.type = type
+    }
+    
+    init?(attributes: [String: Any]) {
     }
     
 }

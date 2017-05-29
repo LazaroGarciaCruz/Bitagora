@@ -8,10 +8,17 @@
 
 import UIKit
 import ImageSlideshow
+import Gifu
 
-class GameTaskViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
+class GameTaskViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate,
                                 TaskTextoTableViewCellDelegate, TaskImagenesTableViewCellDelegate,
                                 TaskURLTableViewCellDelegate, TaskCounterTableViewCellDelegate {
+    
+    //Variable que representa al juego
+    var juegoSeleccionado: Game!
+    var nuevoTask: GameTask?
+    
+    //Variables generales de la clase
     
     @IBOutlet weak var tableView: UITableView!
 
@@ -20,6 +27,24 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
     var listaComponentesTask: Array<TaskComponent> = []
     
     var activeField: UITextView?
+    
+    //Variables para la gestion de la ventana de guardado
+    @IBOutlet weak var backView: UIView!
+    @IBOutlet weak var backView2: UIView!
+    @IBOutlet weak var textoTituloTarea: UITextField!
+    @IBOutlet weak var viewGuardarTarea: UIView!
+    @IBOutlet weak var botonCerrarViewGuardarTarea: UIButton!
+    @IBOutlet weak var botonDificultadFacil: GIFImageView!
+    @IBOutlet weak var botonDificultadNormal: GIFImageView!
+    @IBOutlet weak var botonDificultadDificil: GIFImageView!
+    @IBOutlet weak var botonPrioridadBaja: GIFImageView!
+    @IBOutlet weak var botonPrioridadMedia: GIFImageView!
+    @IBOutlet weak var botonPrioridadAlta: GIFImageView!
+    @IBOutlet weak var botonGuardarTask: UIButton!
+    
+    var tituloTask: String = ""
+    var dificultad: TaskDifficulty = TaskDifficulty.easy
+    var prioridad: TaskPriority = TaskPriority.low
     
     override func viewDidLoad() {
         
@@ -30,6 +55,7 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWasShown), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillBeHidden), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
         
+        inicializarVentanaGuardarTarea()
         generarScanlines()
         prepararTabla()
         
@@ -53,6 +79,80 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
      */
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
+    }
+    
+    func inicializarVentanaGuardarTarea() {
+        
+        textoTituloTarea.delegate = self
+        botonGuardarTask.isEnabled = false
+        
+        //Se establecen las propiedades de la seccion 
+        //para establecer el titulo de la tarea
+        
+        textoTituloTarea.addBorder(width: 1, color: UIColor(red: 0/255, green: 0/255, blue: 173/255, alpha: 255/255))
+        backView.addBorder(width: 2, color: .white)
+        backView2.addBorder(width: 2, color: .white)
+        
+        //Se establecen las propiedades de los selectores
+        //de dificultad y prioridad
+        
+        botonDificultadFacil.animate(withGIFNamed: "dificultad_facil.gif")
+        botonPrioridadBaja.animate(withGIFNamed: "prioridad_baja_star.gif")
+        
+        botonDificultadFacil.addTapGesture(tapNumber: 1) { (gesture) in
+            self.botonDificultadFacil.animate(withGIFNamed: "dificultad_facil.gif")
+            self.botonDificultadNormal.stopAnimatingGIF()
+            self.botonDificultadNormal.image = #imageLiteral(resourceName: "dificultad_normal_desactivado")
+            self.botonDificultadDificil.stopAnimatingGIF()
+            self.botonDificultadDificil.image = #imageLiteral(resourceName: "dificultad_dificil_desactivado")
+            self.dificultad = TaskDifficulty.easy
+        }
+        
+        botonDificultadNormal.addTapGesture(tapNumber: 1) { (gesture) in
+            self.botonDificultadFacil.stopAnimatingGIF()
+            self.botonDificultadFacil.image = #imageLiteral(resourceName: "dificultad_facil_desactivado")
+            self.botonDificultadNormal.animate(withGIFNamed: "dificultad_normal.gif")
+            self.botonDificultadDificil.stopAnimatingGIF()
+            self.botonDificultadDificil.image = #imageLiteral(resourceName: "dificultad_dificil_desactivado")
+            self.dificultad = TaskDifficulty.normal
+        }
+        
+        botonDificultadDificil.addTapGesture(tapNumber: 1) { (gesture) in
+            self.botonDificultadFacil.stopAnimatingGIF()
+            self.botonDificultadFacil.image = #imageLiteral(resourceName: "dificultad_facil_desactivado")
+            self.botonDificultadNormal.stopAnimatingGIF()
+            self.botonDificultadNormal.image = #imageLiteral(resourceName: "dificultad_normal_desactivado")
+            self.botonDificultadDificil.animate(withGIFNamed: "dificultad_dificil.gif")
+            self.dificultad = TaskDifficulty.hard
+        }
+        
+        botonPrioridadBaja.addTapGesture(tapNumber: 1) { (gesture) in
+            self.botonPrioridadBaja.animate(withGIFNamed: "prioridad_baja_star.gif")
+            self.botonPrioridadMedia.stopAnimatingGIF()
+            self.botonPrioridadMedia.image = #imageLiteral(resourceName: "prioridad_media_star_desactivado")
+            self.botonPrioridadAlta.stopAnimatingGIF()
+            self.botonPrioridadAlta.image = #imageLiteral(resourceName: "prioridad_alta_star_desactivado")
+            self.prioridad = TaskPriority.low
+        }
+        
+        botonPrioridadMedia.addTapGesture(tapNumber: 1) { (gesture) in
+            self.botonPrioridadBaja.stopAnimatingGIF()
+            self.botonPrioridadBaja.image = #imageLiteral(resourceName: "prioridad_baja_star_desactivado")
+            self.botonPrioridadMedia.animate(withGIFNamed: "prioridad_media_star.gif")
+            self.botonPrioridadAlta.stopAnimatingGIF()
+            self.botonPrioridadAlta.image = #imageLiteral(resourceName: "prioridad_alta_star_desactivado")
+            self.prioridad = TaskPriority.medium
+        }
+        
+        botonPrioridadAlta.addTapGesture(tapNumber: 1) { (gesture) in
+            self.botonPrioridadBaja.stopAnimatingGIF()
+            self.botonPrioridadBaja.image = #imageLiteral(resourceName: "prioridad_baja_star_desactivado")
+            self.botonPrioridadMedia.stopAnimatingGIF()
+            self.botonPrioridadMedia.image = #imageLiteral(resourceName: "prioridad_media_star_desactivado")
+            self.botonPrioridadAlta.animate(withGIFNamed: "prioridad_alta_star.gif")
+            self.prioridad = TaskPriority.high
+        }
+        
     }
     
     func generarScanlines() {
@@ -101,7 +201,7 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
-    func actualizarImagenes(imagenes: Array<ImageSource>, index: Int) {
+    func actualizarImagenes(imagenes: Array<UIImage>, index: Int) {
         if listaComponentesTask[index] is TaskComponentImages {
             (listaComponentesTask[index] as! TaskComponentImages).listaImagenes = imagenes
         }
@@ -166,9 +266,6 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @IBAction func botonCancelarPulsado(_ sender: Any) {
         dismiss(animated: true, completion: nil)
-    }
-    
-    @IBAction func botonAceptarPulsado(_ sender: Any) {
     }
     
     //------------------------------------------------------------------
@@ -292,7 +389,7 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
     func procesarTaskImagenesCell(indexPath: IndexPath) -> TaskImagenesTableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellImagenes", for: indexPath) as! TaskImagenesTableViewCell
-        cell.localSource = (listaComponentesTask[indexPath.row] as! TaskComponentImages).listaImagenes
+        cell.listaImagenes = (listaComponentesTask[indexPath.row] as! TaskComponentImages).listaImagenes
         cell.indexPath = indexPath
         cell.inicializarImageSlideshow()
         cell.delegate = self
@@ -347,15 +444,129 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         
     }
-
+    
+    //------------------------------------------------------------------
+    //------------------------------------------------------------------
+    //--------------------  METODOS DEL KEYBOARD -----------------------
+    //------------------------------------------------------------------
+    //------------------------------------------------------------------
+    
     /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+     Con este metodo se especifica que se debe hacer cuando
+     un textfield esta activo pierde el foco
+     */
+    func textFieldDidEndEditing(_ textField: UITextField, reason: UITextFieldDidEndEditingReason) {
+        
+        self.view.endEditing(true)
+        tituloTask = textoTituloTarea.text!
+        
+        botonGuardarTask.isEnabled = false
+        botonGuardarTask.backgroundColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 255/255)
+        botonGuardarTask.setTitleColor(.darkGray, for: .normal)
+        if tituloTask != "" {
+            botonGuardarTask.isEnabled = true
+            botonGuardarTask.backgroundColor = .clear
+            botonGuardarTask.setTitleColor(.black, for: .normal)
+        }
+        
     }
-    */
+    
+    /*
+     Con este metodo se especifica que se debe hacer cuando
+     se pulsa return cuando un textfield esta activo
+     */
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        
+        self.view.endEditing(true)
+        tituloTask = textoTituloTarea.text!
+        
+        botonGuardarTask.isEnabled = false
+        botonGuardarTask.backgroundColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 255/255)
+        botonGuardarTask.setTitleColor(.darkGray, for: .normal)
+        if tituloTask != "" {
+            botonGuardarTask.isEnabled = true
+            botonGuardarTask.backgroundColor = .clear
+            botonGuardarTask.setTitleColor(.black, for: .normal)
+        }
+        
+        return false
+        
+    }
 
+    //------------------------------------------------------------------
+    //------------------------------------------------------------------
+    //------------------  METODOS PARA LA CREACION ---------------------
+    //--------------------  DE UNA NUEVA TAREA -------------------------
+    //------------------------------------------------------------------
+    //------------------------------------------------------------------
+    
+    @IBAction func botonAceptarPulsado(_ sender: Any) {
+        
+        textoTituloTarea.text = ""
+        tituloTask = ""
+        botonGuardarTask.isEnabled = false
+        botonGuardarTask.backgroundColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 255/255)
+        botonGuardarTask.setTitleColor(.darkGray, for: .normal)
+        
+        botonDificultadFacil.animate(withGIFNamed: "dificultad_facil.gif")
+        botonDificultadNormal.stopAnimatingGIF()
+        botonDificultadNormal.image = #imageLiteral(resourceName: "dificultad_normal_desactivado")
+        botonDificultadDificil.stopAnimatingGIF()
+        botonDificultadDificil.image = #imageLiteral(resourceName: "dificultad_dificil_desactivado")
+        dificultad = TaskDifficulty.easy
+        botonPrioridadBaja.animate(withGIFNamed: "prioridad_baja_star.gif")
+        botonPrioridadMedia.stopAnimatingGIF()
+        botonPrioridadMedia.image = #imageLiteral(resourceName: "prioridad_media_star_desactivado")
+        botonPrioridadAlta.stopAnimatingGIF()
+        botonPrioridadAlta.image = #imageLiteral(resourceName: "prioridad_alta_star_desactivado")
+        prioridad = TaskPriority.low
+        
+        //Preparamos y lanzamos la animcacion que muestra la vista
+        
+        let panelFondo = UIView(frame: self.view.frame)
+        panelFondo.backgroundColor = .black
+        panelFondo.alpha = 0
+        panelFondo.tag = 100
+        
+        self.view.addSubview(panelFondo)
+        self.view.bringSubview(toFront: panelFondo)
+        self.view.bringSubview(toFront: viewGuardarTarea)
+        
+        viewGuardarTarea.isHidden = false
+        viewGuardarTarea.alpha = 0
+        viewGuardarTarea.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        
+        UIView.animate(withDuration: 0.25) {
+            panelFondo.alpha = 0.6
+            self.viewGuardarTarea.transform = CGAffineTransform.identity
+            self.viewGuardarTarea.alpha = 1
+        }
+        
+    }
+  
+    @IBAction func cerrarVentanaGuardarTarea(_ sender: Any) {
+        
+        for subview in self.view.subviews {
+            if subview.tag == 100 {
+                UIView.animate(withDuration: 0.25, animations: {
+                    subview.alpha = 0
+                    self.viewGuardarTarea.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+                    self.viewGuardarTarea.alpha = 0
+                }, completion: { (exito) in
+                    subview.removeFromSuperview()
+                })
+            }
+        }
+
+    }
+    
+    @IBAction func botonGuardarPulsado(_ sender: Any) {
+        
+        nuevoTask = DataMaganer.sharedInstance.almacenarTask(idJuego: juegoSeleccionado.id, titulo: tituloTask, dificultad: dificultad, prioridad: prioridad, listaComponentes: listaComponentesTask)
+        cerrarVentanaGuardarTarea(sender)
+        self.performSegue(withIdentifier: "volverPantallaJuegoNuevoJuegoTransicion", sender: self)
+        //dismiss(animated: true, completion: nil)
+        
+    }
+    
 }

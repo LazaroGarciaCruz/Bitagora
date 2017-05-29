@@ -1129,7 +1129,7 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
      */
     func borrarCelda(index: Int) {
         
-        if (DataMaganer.sharedInstance.borrarJuego(id: games[index].id)) {
+        if (DataMaganer.sharedInstance.borrarJuego(juego: games[index])) {
             if let cell = self.collectionView.cellForItem(at: IndexPath(row: index, section: 0)) {
                  (cell as! GameCollectionViewCell).cancelarBorrado()
             }

@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftyJSON
+import ImageSlideshow
 
 /*
  Esta clase se va a encargar de la gestion de todos los datos
@@ -82,9 +83,25 @@ class DataMaganer {
         
         //Procesamos el JSON para sacar la lista general de juegos y sus propiedades
         if (json?["juegos"].exists())! {
+            
             for (_, value):(String, JSON) in (json?["juegos"])! {
-                listaDatos.append(Game(attributes: value.dictionary!)!)
+                let game = Game(attributes: value.dictionary!)!
+                listaDatos.append(game)
             }
+            
+        }
+        
+        if (json?["tasks"].exists())! {
+            
+            for (_, value):(String, JSON) in (json?["tasks"])! {
+                let task = GameTask(attributes: value.dictionary!)!
+                for juego in listaDatos {
+                    if juego.id == task.idJuego {
+                        juego.taskLista.append(task)
+                    }
+                }
+            }
+            
         }
         
         return listaDatos
@@ -160,28 +177,217 @@ class DataMaganer {
      juego de la lista de juegos almacenada en un JSON asi como
      sus tareas asociadas y las subtareas
      */
-    func borrarJuego(id: String) -> Bool {
+    func borrarJuego(juego: Game) -> Bool {
         
-        if FileManager.deleteDataFromDocumentsDirectory(relativePath: id) {
+        if (json?["tasks"].exists())! {
+            for task in juego.taskLista {
+                borrarTask(task: task)
+            }
+        }
         
+        if FileManager.deleteDataFromDocumentsDirectory(relativePath: juego.id) {
+    
             if (json?["juegos"].exists())! {
-                
                 for (key, value):(String, JSON) in (json?["juegos"])! {
-                    if value["id"].string == id {
+                    if value["id"].string == juego.id {
                         json?["juegos"].arrayObject?.remove(at: Int(key)!)
                     }
                 }
-                
-                guardarEnDisco()
-                
-                return true
-                
             }
+            
+            guardarEnDisco()
+            
+            return true
             
         }
         
         return false
         
+    }
+    
+    //-----------------------------------------------------------------
+    //----------------- FUNCIONES SOBRE LOS TASK ----------------------
+    //-----------------------------------------------------------------
+    
+    /*
+     Este metodo realiza las tareas necesarias para guar en disco la
+     informacion de una nueva tarea y actualizar el JSON
+     */
+    func almacenarTask(idJuego: String, titulo: String, dificultad: TaskDifficulty, prioridad: TaskPriority, listaComponentes: Array<TaskComponent>) -> GameTask {
+        
+        //Almacenamos en disco los elementos de los
+        //componentes del task y generamos el fragmento
+        //de JSON que los representa
+        
+        if (json?["tasks"].exists())! {
+            
+            do {
+            
+                var listaComponentesJSON: Array<JSON> = []
+                
+                for componente in listaComponentes {
+                    switch componente.type {
+                    case .text:
+                        listaComponentesJSON.append(convertirToJSON(componente: componente as! TaskComponentText))
+                    case .images:
+                        listaComponentesJSON.append(convertirToJSON(id: idJuego, componente: componente as! TaskComponentImages))
+                    case .url:
+                        listaComponentesJSON.append(convertirToJSON(componente: componente as! TaskComponentURL))
+                    case .counter:
+                        listaComponentesJSON.append(convertirToJSON(componente: componente as! TaskComponentCounter))
+                    default:
+                        listaComponentesJSON.append(JSON(""))
+                    }
+                }
+                
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "dd-MM-yyyy hh:mm:ss.sss"
+                let id = randomString(length: 10).uppercased()
+                
+                let newData: JSON = (["id": id, "idJuego": idJuego, "titulo": titulo, "fecha": dateFormatter.string(from: Date()),
+                                      "dificultad": dificultad.rawValue, "prioridad": prioridad.rawValue, "componentes": listaComponentesJSON])
+                let update: JSON = JSON(["tasks": [newData]])
+                try json?.merge(with: update)
+                
+                guardarEnDisco()
+                
+                //return GameTask(attributes: newData.dictionary!, listaComponentes: listaComponentes)!
+                return GameTask(attributes: newData.dictionary!)!
+                
+            } catch let error as NSError {
+                print("Error: \(error.debugDescription)")
+            }
+            
+        }
+        
+        return GameTask()
+        
+    }
+    
+    /*
+     Este metodo lleva a cabo las tareas necesarias para borrar un
+     task de la lista de task de un juego almacenada en un JSON
+    */
+    func borrarTask(task: GameTask) -> Bool {
+        
+        //Se comprueba si el task tiene algun
+        //componente de imagen y si es asi se
+        //borrar las imagenes asociadas
+        for componente in task.listaComponentesTask {
+            if componente.type == TaskComponentType.images {
+                let componenteImage = componente as! TaskComponentImages
+                for imagen in componenteImage.listaNombresImagenes {
+                    if !FileManager.deleteDataFromDocumentsDirectory(relativePath: task.idJuego + "/" + imagen + ".png") {
+                       print("Error borrando imagen \(imagen) del task \(task.id)")
+                    }
+                }
+            }
+        }
+        
+        //Con el siguiente codigo se borra la 
+        //informacion del task del JSON
+        
+        if (json?["tasks"].exists())! {
+            
+            for (key, value):(String, JSON) in (json?["tasks"])! {
+                if value["id"].string == task.id {
+                    var listaTask = json?["tasks"].arrayObject
+                    listaTask?.remove(at: Int(key)!)
+                    json?.dictionaryObject?.updateValue(listaTask, forKey: "tasks")
+                }
+            }
+            
+            guardarEnDisco()
+            
+            return true
+            
+        }
+        
+        return false
+        
+    }
+    
+    /*
+     Este metodo lleva a cabo las tareas necesarias para actualizar
+     el valor de contado de un task determinado
+     */
+    func actualizarContadorTask(id: String, taskComponente: TaskComponentCounter) {
+        
+        if (json?["tasks"].exists())! {
+            
+            var taskNumber = 0
+            var taskNumberCurrent = 0
+            var taskNumberComponente = 0
+            var taskNumberComponenteCurrent = 0
+            
+            for (_, value):(String, JSON) in (json?["tasks"])! {
+                if value["id"].string == id {
+                    taskNumberComponenteCurrent = 0
+                    for componente in value["componentes"] {
+                        if TaskComponentType(rawValue: componente.1.dictionaryObject?["tipo"] as! Int)! == TaskComponentType.counter
+                            && componente.1.dictionaryObject?["id"] as! String == taskComponente.id {
+                            taskNumberComponente = taskNumberComponenteCurrent
+                        } else {
+                            taskNumberComponenteCurrent += 1
+                        }
+                    }
+                    taskNumber = taskNumberCurrent
+                } else {
+                    taskNumberCurrent += 1
+                }
+            }
+            
+            json?["tasks"][taskNumber]["componentes"][taskNumberComponente].dictionaryObject?.updateValue(taskComponente.currentElementCount, forKey: "elementosActuales")
+            
+            guardarEnDisco()
+            
+        }
+        
+    }
+    
+    /*
+     Devuelve las propiedades de un componente de tarea
+     de texto en formato JSON
+     */
+    func convertirToJSON(componente: TaskComponentText) -> JSON {
+        return JSON(["tipo": componente.type.rawValue, "texto": componente.texto])
+    }
+    
+    /*
+     Devuelve las propiedades de un componente de tarea
+     de imagenes en formato JSON
+     */
+    func convertirToJSON(id: String, componente: TaskComponentImages) -> JSON {
+        
+        var listaImagenes: Array<String> = []
+        for imagen in componente.listaImagenes {
+            let tituloImagen = randomString(length: 10).uppercased()
+            if let data = UIImagePNGRepresentation(imagen) {
+                if FileManager.writeToDocumentsDirectory(data: data, relativePath: id + "/" + tituloImagen + ".png") {
+                    listaImagenes.append(tituloImagen)
+                    componente.listaNombresImagenes.append(tituloImagen)
+                }
+            }
+        }
+        
+        return JSON(["tipo": componente.type.rawValue, "imagenes": listaImagenes])
+ 
+    }
+    
+    /*
+     Devuelve las propiedades de un componente de tarea
+     de enalce en formato JSON
+     */
+    func convertirToJSON(componente: TaskComponentURL) -> JSON {
+        return JSON(["tipo": componente.type.rawValue, "isVideo": componente.isVideo, "URL": componente.url])
+    }
+    
+    /*
+     Devuelve las propiedades de un componente de tarea
+     de contador en formato JSON
+     */
+    func convertirToJSON(componente: TaskComponentCounter) -> JSON {
+        return JSON(["tipo": componente.type.rawValue, "id": componente.id, "descripcion": componente.descripcion, "maxElementos": componente.maxElements, "elementosActuales": componente.currentElementCount])
     }
     
     //-----------------------------------------------------------------
@@ -216,7 +422,7 @@ class DataMaganer {
      Funcion que devuelve una cadena aletoria para identificar
      principalmente a cada uno de los juegos que se registran
      */
-    private func randomString(length: Int) -> String {
+    public func randomString(length: Int) -> String {
         
         let charSet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         var c = charSet.characters.map { String($0) }

@@ -7,14 +7,26 @@
 //
 
 import Foundation
+import SwiftyJSON
 
 public class TaskComponentText: TaskComponent {
     
     public var texto: String = ""
     
     override init() {
-        super.init()
-        type = TaskComponentType.text
+        super.init(type: TaskComponentType.text)
+    }
+    
+    override init?(attributes: [String: Any]) {
+        
+        super.init(type: TaskComponentType.text)
+        
+        guard let texto = (attributes["texto"] as? JSON)?.string else {
+                return nil
+        }
+        
+        self.texto = texto
+        
     }
     
 }

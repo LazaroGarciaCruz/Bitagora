@@ -9,6 +9,10 @@
 import UIKit
 import Gifu
 
+protocol GameTaskTableViewCellDelegate: class {
+    func borrarCelda(index: Int)
+}
+
 class GameTaskTableViewCell: UITableViewCell {
 
     @IBOutlet weak var fondo: UIView!
@@ -26,6 +30,13 @@ class GameTaskTableViewCell: UITableViewCell {
     
     @IBOutlet weak var viewTextoLeading: NSLayoutConstraint!
     @IBOutlet weak var viewTextoTop: NSLayoutConstraint!
+    
+    @IBOutlet weak var botonBorrar: GlowLabelSimple!
+    @IBOutlet weak var botonCancelarBorrado: UIButton!
+    var isModoBorrado = false
+    
+    var indexPath: IndexPath?
+    var delegate: GameTaskTableViewCellDelegate?
     
     var cadenaTitulo = ""
     var cadenaFecha = ""
@@ -61,11 +72,25 @@ class GameTaskTableViewCell: UITableViewCell {
      los elementos visuales de la misma
      */
     override func prepareForReuse() {
+        
         textoTitulo.text = ""
         textoFecha.text = ""
         mainView.backgroundColor = UIColor.clear
         self.backgroundColor = UIColor.clear
         pantalla.isHidden = true
+        
+        if botonCancelarBorrado.gestureRecognizers == nil {
+            botonCancelarBorrado.addTapGesture(tapNumber: 1, action: { (sender) in
+                self.cancelarBorrado()
+            })
+        }
+        
+        if botonBorrar.gestureRecognizers == nil {
+            botonBorrar.addTapGesture(tapNumber: 1, action: { (sender) in
+                self.delegate?.borrarCelda(index: (self.indexPath?.row)!)
+            })
+        }
+        
     }
     
     /*
@@ -141,6 +166,37 @@ class GameTaskTableViewCell: UITableViewCell {
             self.textoFecha.text = self.cadenaFecha
             self.textoFecha.animateText(timeInterval: 0.05)
         }
+        
+    }
+    
+    /*
+     Este metodo lleva a cabo las tareas necesarias para animar
+     el posible borrado de la celda en cuestion
+     */
+    func animacionBorrado() {
+        
+        UIView.transition(with: self.contentView, duration: 0.5, options: .transitionFlipFromLeft, animations: {
+            self.viewTexto.isHidden = true
+            self.viewEstados.isHidden = true
+            self.botonCancelarBorrado.isHidden = false
+            self.botonBorrar.isHidden = false
+            self.botonBorrar.animateText(timeInterval: 0.15)
+        })
+        
+    }
+    
+    /*
+     Este metodo lleva a cabo las tareas necesarias para animar
+     la celda cuando se cancela el borrado de la misma
+     */
+    func cancelarBorrado() {
+        
+        UIView.transition(with: self.contentView, duration: 0.5, options: .transitionFlipFromRight, animations: {
+            self.botonCancelarBorrado.isHidden = true
+            self.botonBorrar.isHidden = true
+            self.viewTexto.isHidden = false
+            self.viewEstados.isHidden = false
+        })
         
     }
     

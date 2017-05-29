@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftyJSON
 
 public class TaskComponentURL: TaskComponent {
     
@@ -14,8 +15,22 @@ public class TaskComponentURL: TaskComponent {
     public var url: String = ""
     
     override init() {
-        super.init()
-        type = TaskComponentType.url
+        super.init(type: TaskComponentType.url)
+    }
+    
+    override init?(attributes: [String: Any]) {
+        
+        super.init(type: TaskComponentType.url)
+        
+        guard let isVideo = (attributes["isVideo"] as? JSON)?.bool,
+        let url = (attributes["URL"] as? JSON)?.string
+            else {
+            return nil
+        }
+        
+        self.isVideo = isVideo
+        self.url = url
+        
     }
     
 }

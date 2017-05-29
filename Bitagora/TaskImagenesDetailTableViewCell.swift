@@ -13,6 +13,7 @@ class TaskImagenesDetailTableViewCell: UITableViewCell {
 
     @IBOutlet weak var imageSlideshow: ImageSlideshow!
     
+    var listaImagenes: Array<UIImage> = []
     var localSource: Array<ImageSource> = []
     
     override func awakeFromNib() {
@@ -34,6 +35,10 @@ class TaskImagenesDetailTableViewCell: UITableViewCell {
         imageSlideshow.contentScaleMode = UIViewContentMode.scaleAspectFill
         imageSlideshow.activityIndicator = DefaultActivityIndicator()
         
+        localSource = []
+        for imagen in listaImagenes {
+            localSource.append(ImageSource(image: imagen))
+        }
         imageSlideshow.setImageInputs(localSource)
         
         let recognizer = UITapGestureRecognizer(target: self, action: #selector(mostrarFullScreenController))

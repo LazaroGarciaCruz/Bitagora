@@ -9,7 +9,7 @@
 import UIKit
 import Gifu
 
-class GameScreenViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class GameScreenViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, GameTaskTableViewCellDelegate {
     
     enum OrdenacionLista : Int {
         
@@ -197,6 +197,23 @@ class GameScreenViewController: UIViewController, UITableViewDataSource, UITable
             coloresActuales.append(coloresPantalla[Int(randomNum)])
             randomNum = arc4random_uniform(2)
             hardwareActual.append(gifHardware[Int(randomNum)])
+        }
+        
+        //Se le añade el control para borrar de elementos
+        
+        tableView.addLongPressGesture { (sender) in
+            
+            if sender.state != UIGestureRecognizerState.ended {
+                return
+            }
+            
+            let p = sender.location(in: self.tableView)
+            let indexPath = self.tableView.indexPathForRow(at: p)
+            
+            if let index = indexPath {
+                (self.tableView.cellForRow(at: index) as! GameTaskTableViewCell).animacionBorrado()
+            }
+            
         }
         
     }
@@ -518,6 +535,8 @@ class GameScreenViewController: UIViewController, UITableViewDataSource, UITable
         
         cell.pantalla.backgroundColor = UIColor(cgColor: coloresActuales[indexPath.row])
         cell.imagenHardware.animate(withGIFNamed: hardwareActual[indexPath.row])
+        cell.indexPath = indexPath
+        cell.delegate = self
         
         switch task.priority {
             case .low:
@@ -551,6 +570,26 @@ class GameScreenViewController: UIViewController, UITableViewDataSource, UITable
         
     }
     
+    /*
+     Este metodo lleva a cabo las tareas necesarias para
+     el borrado de una celda del table view
+     */
+    func borrarCelda(index: Int) {
+        
+        if (DataMaganer.sharedInstance.borrarTask(task: juegoSeleccionado.taskLista[index])) {
+            
+            if let cell = self.tableView.cellForRow(at: IndexPath(row: index, section: 0)) {
+                (cell as! GameTaskTableViewCell).cancelarBorrado()
+            }
+            
+            juegoSeleccionado.taskLista.remove(at: index)
+            listaTask.remove(at: index)
+            tableView.reloadData()
+            
+        }
+        
+    }
+    
     //------------------------------------------------------------------
     //------------------------------------------------------------------
     //-----------------------  NAVEGACION ------------------------------
@@ -573,6 +612,11 @@ class GameScreenViewController: UIViewController, UITableViewDataSource, UITable
             
             toViewController.transitioningDelegate = transicion
             
+        } else if segue.identifier == "showNewTask" {
+            
+            let toViewController = segue.destination as! GameTaskViewController
+            toViewController.juegoSeleccionado = juegoSeleccionado
+            
         }
         
     }
@@ -582,6 +626,24 @@ class GameScreenViewController: UIViewController, UITableViewDataSource, UITable
      */
     @IBAction func volverPantallaJuego(segue: UIStoryboardSegue) {
         
+        if segue.identifier == "volverPantallaJuegoNuevoJuegoTransicion" {
+            
+            let fromViewController = segue.source as! GameTaskViewController
+            
+            juegoSeleccionado.taskLista.append(fromViewController.nuevoTask!)
+            listaTask.append(fromViewController.nuevoTask!)
+            
+            coloresActuales = []
+            for _ in juegoSeleccionado.taskLista {
+                var randomNum: UInt32 = arc4random_uniform(3)
+                coloresActuales.append(coloresPantalla[Int(randomNum)])
+                randomNum = arc4random_uniform(2)
+                hardwareActual.append(gifHardware[Int(randomNum)])
+            }
+            
+            tableView.reloadData()
+            
+        }
         
     }
 

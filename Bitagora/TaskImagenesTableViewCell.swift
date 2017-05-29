@@ -10,7 +10,7 @@ import UIKit
 import ImageSlideshow
 
 protocol TaskImagenesTableViewCellDelegate: class {
-    func actualizarImagenes(imagenes: Array<ImageSource>, index: Int)
+    func actualizarImagenes(imagenes: Array<UIImage>, index: Int)
     func borrarElemento(index: Int)
 }
 
@@ -27,6 +27,7 @@ class TaskImagenesTableViewCell: UITableViewCell, UIImagePickerControllerDelegat
     var indexPath: IndexPath?
     
     var localSource: Array<ImageSource> = []
+    var listaImagenes: Array<UIImage> = []
     
     let imagePicker = UIImagePickerController()
     
@@ -69,6 +70,10 @@ class TaskImagenesTableViewCell: UITableViewCell, UIImagePickerControllerDelegat
         imageSlideshow.contentScaleMode = UIViewContentMode.scaleAspectFill
         imageSlideshow.activityIndicator = DefaultActivityIndicator()
         
+        localSource = []
+        for imagen in listaImagenes {
+            localSource.append(ImageSource(image: imagen))
+        }
         imageSlideshow.setImageInputs(localSource)
         
         let recognizer = UITapGestureRecognizer(target: self, action: #selector(mostrarFullScreenController))
@@ -91,8 +96,9 @@ class TaskImagenesTableViewCell: UITableViewCell, UIImagePickerControllerDelegat
         let chosenImage = info[UIImagePickerControllerOriginalImage] as! UIImage
         
         localSource.append(ImageSource(image: chosenImage))
+        listaImagenes.append(chosenImage)
         imageSlideshow.setImageInputs(localSource)
-        delegate?.actualizarImagenes(imagenes: localSource, index: (indexPath?.row)!)
+        delegate?.actualizarImagenes(imagenes: listaImagenes, index: (indexPath?.row)!)
         
         if let viewController = parentViewController as? GameTaskViewController {
             viewController.dismiss(animated:true, completion: nil)
