@@ -18,8 +18,7 @@ protocol TaskTextoTableViewCellDelegate: class {
 class TaskTextoTableViewCell: UITableViewCell, UITextViewDelegate {
 
     @IBOutlet weak var textView: UITextView!
-    @IBOutlet weak var backView: UIView!
-    @IBOutlet weak var backView2: UIView!
+    @IBOutlet weak var textTip: UILabel!
     
     weak var delegate: TaskTextoTableViewCellDelegate?
     
@@ -35,27 +34,11 @@ class TaskTextoTableViewCell: UITableViewCell, UITextViewDelegate {
         
         super.awakeFromNib()
         
-        textView.delegate = self
-        NotificationCenter.default.addObserver(self, selector: #selector(textDidChange(_:)), name: NSNotification.Name.UITextViewTextDidChange, object: nil)
-
-        textView.addBorder(width: 1, color: .black)
-        
-        let panel = UIView(frame: self.frame)
-        panel.w = panel.w * 2
-        panel.h = panel.h * 100
-        panel.x = panel.x + 10
-        panel.y = panel.y + 20
-        panel.backgroundColor = .black
-        panel.tag = 100
-        
-        self.addSubview(panel)
-        self.sendSubview(toBack: panel)
-        
         self.backgroundColor = .clear
         
-        textView.addBorder(width: 1, color: UIColor(red: 0/255, green: 0/255, blue: 173/255, alpha: 255/255))
-        backView.addBorder(width: 2, color: .white)
-        backView2.addBorder(width: 2, color: .white)
+        textView.delegate = self
+        //textView.addBorder(width: 1, color: UIColor(red: 128/255, green: 0/255, blue: 64/255, alpha: 1))
+        NotificationCenter.default.addObserver(self, selector: #selector(textDidChange(_:)), name: NSNotification.Name.UITextViewTextDidChange, object: nil)
         
     }
     
@@ -68,6 +51,7 @@ class TaskTextoTableViewCell: UITableViewCell, UITextViewDelegate {
     
     func textViewDidBeginEditing(_ textView: UITextView) {
         delegate?.establecerTextoActivo(index: (indexPath?.row)!)
+        textTip.isHidden = true
     }
     
     func textViewDidChange(_ textView: UITextView) {
@@ -80,6 +64,9 @@ class TaskTextoTableViewCell: UITableViewCell, UITextViewDelegate {
     
     func textViewDidEndEditing(_ textView: UITextView) {
         //delegate?.actualizarTexto(texto: textView.text, index: (indexPath?.row)!)
+        if textView.text == "" {
+            textTip.isHidden = false
+        }
     }
     
     @IBAction func borrarCelda(_ sender: Any) {

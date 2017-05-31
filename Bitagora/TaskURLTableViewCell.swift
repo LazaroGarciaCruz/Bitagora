@@ -14,16 +14,14 @@ protocol TaskURLTableViewCellDelegate: class {
     func borrarElemento(index: Int)
 }
 
-class TaskURLTableViewCell: UITableViewCell {
+class TaskURLTableViewCell: UITableViewCell, UITextFieldDelegate {
 
     @IBOutlet weak var playerView: YouTubePlayerView!
-    
+    @IBOutlet weak var playerViewContainer: UIView!
     @IBOutlet weak var validateLinkView: UIView!
     @IBOutlet weak var validateText: UITextField!
     @IBOutlet weak var validateButton: UIButton!
-    @IBOutlet weak var backView: UIView!
-    @IBOutlet weak var backView2: UIView!
-    
+    @IBOutlet weak var textoTip: UILabel!
     @IBOutlet weak var simpleLinkView: UIView!
     @IBOutlet weak var simpleLinkText: UILabel!
     
@@ -39,22 +37,8 @@ class TaskURLTableViewCell: UITableViewCell {
         
         super.awakeFromNib()
         
-        playerView.addBorder(width: 1, color: .black)
-        
-        let panel = UIView(frame: self.frame)
-        panel.w = panel.w * 2
-        panel.h = panel.h * 2
-        panel.x = panel.x + 10
-        panel.y = panel.y + 20
-        panel.backgroundColor = .black
-        
-        self.addSubview(panel)
-        self.sendSubview(toBack: panel)
-        
+        validateText.delegate = self
         self.backgroundColor = .clear
-        
-        backView.addBorder(width: 2, color: .white)
-        backView2.addBorder(width: 2, color: .white)
         
     }
 
@@ -62,14 +46,28 @@ class TaskURLTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        textoTip.isHidden = true
+        validateButton.isEnabled = true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if validateText.text == "" {
+            textoTip.isHidden = false
+            validateButton.isEnabled = false
+        }
+    }
+    
     func inicializarComponentes() {
         
         if textoURL == "" {
             
             self.validateLinkView.isHidden = false
+            self.textoTip.isHidden = false
             self.simpleLinkView.isHidden = true
-            self.playerView.isHidden = true
+            self.playerViewContainer.isHidden = true
             validateText.text = ""
+            validateButton.isEnabled = false
             
         } else {
             
@@ -78,9 +76,13 @@ class TaskURLTableViewCell: UITableViewCell {
                 cargarVideoYouTube()
                 self.validateLinkView.isHidden = true
                 self.simpleLinkView.isHidden = true
-                self.playerView.isHidden = false
+                self.playerViewContainer.isHidden = false
                 
             } else {
+                
+                self.validateLinkView.isHidden = true
+                self.simpleLinkView.isHidden = false
+                self.playerViewContainer.isHidden = true
                 
                 simpleLinkText.text = textoURL
                 simpleLinkText.addTapGesture(tapNumber: 1, action: { (sender) in
@@ -112,10 +114,6 @@ class TaskURLTableViewCell: UITableViewCell {
                     
                 })
                 
-                self.validateLinkView.isHidden = true
-                self.simpleLinkView.isHidden = false
-                self.playerView.isHidden = true
-                
             }
             
         }
@@ -136,9 +134,6 @@ class TaskURLTableViewCell: UITableViewCell {
     }
     
     @IBAction func validarURL(_ sender: Any) {
-        
-        //validateText.isEnabled = false
-        //validateButton.isEnabled = false
         
         textoURL = validateText.text!
         
@@ -169,20 +164,9 @@ class TaskURLTableViewCell: UITableViewCell {
                         return
                     }
                     
-                    //if ["http", "https"].contains(url.scheme?.lowercased() ?? "") {
-                        self.isVideo = false
-                        self.delegate?.actualizarURL(url: self.textoURL, isVideo: self.isVideo, index: (self.indexPath?.row)!)
-                    /*} else {
-                        // Scheme is not supported or no scheme is given, use openURL
-                        //UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                        let alertVC = UIAlertController(title: "URL mal formada", message: "La URL debe comenzar por 'http://' o 'https://'", preferredStyle: .alert)
-                        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-                        alertVC.addAction(okAction)
-                        if let viewController = self.parentViewController as? GameTaskViewController {
-                            viewController.present(alertVC, animated: true, completion: nil)
-                        }
-                    }*/
-                    
+                    self.isVideo = false
+                    self.delegate?.actualizarURL(url: self.textoURL, isVideo: self.isVideo, index: (self.indexPath?.row)!)
+
                 }
                 
             }
@@ -190,6 +174,7 @@ class TaskURLTableViewCell: UITableViewCell {
         } else {
             
             validateText.text = ""
+            textoTip.isHidden = false
             let alertVC = UIAlertController(title: "URL no valida", message: "La URL introducida esta en un formato incorrecto", preferredStyle: .alert)
             let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
             alertVC.addAction(okAction)
@@ -202,7 +187,15 @@ class TaskURLTableViewCell: UITableViewCell {
     }
     
     @IBAction func borrarCelda(_ sender: Any) {
+        
+        if self.playerView.ready {
+            if self.playerView.playerState == YouTubePlayerState.Playing {
+                self.playerView.stop()
+            }
+        }
+        
         delegate?.borrarElemento(index: (indexPath?.row)!)
+        
     }
 
 }

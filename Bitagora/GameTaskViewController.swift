@@ -22,6 +22,9 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @IBOutlet weak var tableView: UITableView!
 
+    @IBOutlet weak var backTitleView: UIView!
+    @IBOutlet weak var titleView: GradientView!
+    @IBOutlet weak var backgroundView: PassThroughView!
     @IBOutlet weak var scanlineView: PassThroughView!
     
     var listaComponentesTask: Array<TaskComponent> = []
@@ -29,8 +32,6 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
     var activeField: UITextView?
     
     //Variables para la gestion de la ventana de guardado
-    @IBOutlet weak var backView: UIView!
-    @IBOutlet weak var backView2: UIView!
     @IBOutlet weak var textoTituloTarea: UITextField!
     @IBOutlet weak var viewGuardarTarea: UIView!
     @IBOutlet weak var botonCerrarViewGuardarTarea: UIButton!
@@ -41,6 +42,9 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBOutlet weak var botonPrioridadMedia: GIFImageView!
     @IBOutlet weak var botonPrioridadAlta: GIFImageView!
     @IBOutlet weak var botonGuardarTask: UIButton!
+    @IBOutlet weak var fondoPanel: UIImageView!
+    @IBOutlet weak var fondoBotonGuardar: UIImageView!
+    @IBOutlet weak var textoTip: UILabel!
     
     var tituloTask: String = ""
     var dificultad: TaskDifficulty = TaskDifficulty.easy
@@ -49,6 +53,15 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
     override func viewDidLoad() {
         
         super.viewDidLoad()
+
+        //Propiedades del status bar
+        
+        var colores: Array<CGColor> = [UIColor(red: 144/255, green: 42/255, blue: 135/255, alpha: 1).cgColor,
+                                       UIColor(red: 252/255, green: 2/255, blue: 84/255, alpha: 1).cgColor]
+        
+        let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
+        statusBarView.createGradientWithColors(colors: colores, direction: .horizontal)
+        view.addSubview(statusBarView)
         
         //Estas notificaciones son las que permiten a la vista
         //saber cuando se va a mostrar el teclado y cuando se oculta
@@ -67,10 +80,10 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     /*
-     Este metodo se llama cuando la vista se ha cargado
+     Establece la barra de estado de color blanco
      */
-    override func viewDidAppear(_ animated: Bool) {
-        //tableView.reloadData()
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
     }
     
     /*
@@ -86,21 +99,15 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
         textoTituloTarea.delegate = self
         botonGuardarTask.isEnabled = false
         
-        //Se establecen las propiedades de la seccion 
-        //para establecer el titulo de la tarea
-        
-        textoTituloTarea.addBorder(width: 1, color: UIColor(red: 0/255, green: 0/255, blue: 173/255, alpha: 255/255))
-        backView.addBorder(width: 2, color: .white)
-        backView2.addBorder(width: 2, color: .white)
-        
         //Se establecen las propiedades de los selectores
         //de dificultad y prioridad
         
-        botonDificultadFacil.animate(withGIFNamed: "dificultad_facil.gif")
-        botonPrioridadBaja.animate(withGIFNamed: "prioridad_baja_star.gif")
+        botonDificultadFacil.image = #imageLiteral(resourceName: "dificultad_facil_color")
+        botonPrioridadBaja.image = #imageLiteral(resourceName: "prioridad_baja_star_color")
         
         botonDificultadFacil.addTapGesture(tapNumber: 1) { (gesture) in
-            self.botonDificultadFacil.animate(withGIFNamed: "dificultad_facil.gif")
+            //self.botonDificultadFacil.animate(withGIFNamed: "dificultad_facil.gif")
+            self.botonDificultadFacil.image = #imageLiteral(resourceName: "dificultad_facil_color")
             self.botonDificultadNormal.stopAnimatingGIF()
             self.botonDificultadNormal.image = #imageLiteral(resourceName: "dificultad_normal_desactivado")
             self.botonDificultadDificil.stopAnimatingGIF()
@@ -111,7 +118,7 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
         botonDificultadNormal.addTapGesture(tapNumber: 1) { (gesture) in
             self.botonDificultadFacil.stopAnimatingGIF()
             self.botonDificultadFacil.image = #imageLiteral(resourceName: "dificultad_facil_desactivado")
-            self.botonDificultadNormal.animate(withGIFNamed: "dificultad_normal.gif")
+            self.botonDificultadNormal.image = #imageLiteral(resourceName: "dificultad_normal_color")
             self.botonDificultadDificil.stopAnimatingGIF()
             self.botonDificultadDificil.image = #imageLiteral(resourceName: "dificultad_dificil_desactivado")
             self.dificultad = TaskDifficulty.normal
@@ -122,12 +129,12 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
             self.botonDificultadFacil.image = #imageLiteral(resourceName: "dificultad_facil_desactivado")
             self.botonDificultadNormal.stopAnimatingGIF()
             self.botonDificultadNormal.image = #imageLiteral(resourceName: "dificultad_normal_desactivado")
-            self.botonDificultadDificil.animate(withGIFNamed: "dificultad_dificil.gif")
+            self.botonDificultadDificil.image = #imageLiteral(resourceName: "dificultad_dificl_color")
             self.dificultad = TaskDifficulty.hard
         }
         
         botonPrioridadBaja.addTapGesture(tapNumber: 1) { (gesture) in
-            self.botonPrioridadBaja.animate(withGIFNamed: "prioridad_baja_star.gif")
+            self.botonPrioridadBaja.image = #imageLiteral(resourceName: "prioridad_baja_star_color")
             self.botonPrioridadMedia.stopAnimatingGIF()
             self.botonPrioridadMedia.image = #imageLiteral(resourceName: "prioridad_media_star_desactivado")
             self.botonPrioridadAlta.stopAnimatingGIF()
@@ -138,7 +145,7 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
         botonPrioridadMedia.addTapGesture(tapNumber: 1) { (gesture) in
             self.botonPrioridadBaja.stopAnimatingGIF()
             self.botonPrioridadBaja.image = #imageLiteral(resourceName: "prioridad_baja_star_desactivado")
-            self.botonPrioridadMedia.animate(withGIFNamed: "prioridad_media_star.gif")
+            self.botonPrioridadMedia.image = #imageLiteral(resourceName: "prioridad_media_star_color")
             self.botonPrioridadAlta.stopAnimatingGIF()
             self.botonPrioridadAlta.image = #imageLiteral(resourceName: "prioridad_alta_star_desactivado")
             self.prioridad = TaskPriority.medium
@@ -149,7 +156,7 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
             self.botonPrioridadBaja.image = #imageLiteral(resourceName: "prioridad_baja_star_desactivado")
             self.botonPrioridadMedia.stopAnimatingGIF()
             self.botonPrioridadMedia.image = #imageLiteral(resourceName: "prioridad_media_star_desactivado")
-            self.botonPrioridadAlta.animate(withGIFNamed: "prioridad_alta_star.gif")
+            self.botonPrioridadAlta.image = #imageLiteral(resourceName: "prioridad_alta_star_color")
             self.prioridad = TaskPriority.high
         }
         
@@ -173,21 +180,73 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
             imageView.setRotationX(x: 180)
             imageView.contentMode = .scaleAspectFill
             imageView.clipsToBounds = true
-            imageView.alpha = 0.25
+            imageView.alpha = 0.20
             scanlineView.addSubview(imageView)
             index += 1
         }
+        
+        for subview in backgroundView.subviews {
+            subview.removeFromSuperview()
+        }
+        
+        /*var imagenesHorizontal = 12
+        var imagenesVertical = 1
+        var widthGif: CGFloat = backTitleView.w / CGFloat(imagenesHorizontal)
+        var heigthGif: CGFloat = backTitleView.h
+        
+        backTitleView.addBorder(width: 5, color: .clear)
+        
+        for indexW in 0...imagenesHorizontal {
+            let gif = GIFImageView(frame: CGRect(x: CGFloat(indexW) * widthGif, y: 0, width: widthGif, height: heigthGif))
+            gif.animate(withGIFNamed: "stars_grey_background.gif")
+            gif.addBorder(width: 3, color: .clear)
+            backTitleView.addSubview(gif)
+            backTitleView.sendSubview(toBack: gif)
+        }*/
+        
+        let imagenesHorizontal = 2
+        let imagenesVertical = 1
+        let widthGif = UIScreen.main.bounds.height / CGFloat(imagenesHorizontal)
+        let heigthGif = UIScreen.main.bounds.height / CGFloat(imagenesVertical)
+        
+        for indexH in 0...imagenesVertical {
+            for indexW in 0...imagenesHorizontal {
+                let gif = GIFImageView(frame: CGRect(x: CGFloat(indexW) * widthGif, y: CGFloat(indexH) * heigthGif, width: widthGif, height: heigthGif))
+                gif.animate(withGIFNamed: "stars_purple_background.gif")
+                backgroundView.addSubview(gif)
+            }
+        }
+        
+        /*let imagenesHorizontal = 1
+        let imagenesVertical = 2
+        let widthGif: CGFloat = UIScreen.main.bounds.height / CGFloat(imagenesHorizontal)
+        let heigthGif: CGFloat = UIScreen.main.bounds.height / CGFloat(imagenesVertical)
+        
+        for indexH in 0...imagenesVertical {
+            for indexW in 0...imagenesHorizontal {
+                let gif = GIFImageView(frame: CGRect(x: CGFloat(indexW) * widthGif, y: CGFloat(indexH) * heigthGif, width: widthGif, height: heigthGif))
+                gif.animate(withGIFNamed: "stars_scroll_background.gif")
+                backgroundView.addSubview(gif)
+            }
+        }*/
+        
+        //Inicializamos el title view
+        
+        /*colores = [UIColor(red: 144/255, green: 42/255, blue: 135/255, alpha: 1).cgColor,
+                   UIColor(red: 252/255, green: 2/255, blue: 84/255, alpha: 1).cgColor]
+        titleView.colores = colores
+        titleView.direccion = UIView.UIViewLinearGradientDirection.diagonalFromRightToLeftAndTopToDown*/
         
     }
     
     func ajustarTexto() {
         
-        let currentOffset = tableView.contentOffset
+        /*let currentOffset = tableView.contentOffset
         UIView.setAnimationsEnabled(false)
         tableView.beginUpdates()
         tableView.endUpdates()
         UIView.setAnimationsEnabled(true)
-        tableView.setContentOffset(currentOffset, animated: false)
+        tableView.setContentOffset(currentOffset, animated: false)*/
         
         tableView.scrollToRow(at: IndexPath(row: (activeField?.tag)!, section: 0), at: .bottom, animated: false)
         
@@ -428,8 +487,8 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
         
         switch (listaComponentesTask[indexPath.row] as TaskComponent).type {
             case TaskComponentType.text:
-                return UITableViewAutomaticDimension
-                //return 175
+                //return UITableViewAutomaticDimension
+                return 250
             case TaskComponentType.images:
                 return 250
             case TaskComponentType.url:
@@ -453,6 +512,14 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
     
     /*
      Con este metodo se especifica que se debe hacer cuando
+     un textfield que esta inactivo gana el foco
+     */
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        textoTip.isHidden = true
+    }
+    
+    /*
+     Con este metodo se especifica que se debe hacer cuando
      un textfield esta activo pierde el foco
      */
     func textFieldDidEndEditing(_ textField: UITextField, reason: UITextFieldDidEndEditingReason) {
@@ -461,12 +528,16 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
         tituloTask = textoTituloTarea.text!
         
         botonGuardarTask.isEnabled = false
-        botonGuardarTask.backgroundColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 255/255)
+        fondoBotonGuardar.image = #imageLiteral(resourceName: "window_button_desactivado")
+        //botonGuardarTask.backgroundColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 255/255)
         botonGuardarTask.setTitleColor(.darkGray, for: .normal)
         if tituloTask != "" {
             botonGuardarTask.isEnabled = true
             botonGuardarTask.backgroundColor = .clear
+            fondoBotonGuardar.image = #imageLiteral(resourceName: "window_button")
             botonGuardarTask.setTitleColor(.black, for: .normal)
+        } else {
+            textoTip.isHidden = false
         }
         
     }
@@ -481,12 +552,16 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
         tituloTask = textoTituloTarea.text!
         
         botonGuardarTask.isEnabled = false
-        botonGuardarTask.backgroundColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 255/255)
+        //botonGuardarTask.backgroundColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 255/255)
+        fondoBotonGuardar.image = #imageLiteral(resourceName: "window_button_desactivado")
         botonGuardarTask.setTitleColor(.darkGray, for: .normal)
         if tituloTask != "" {
             botonGuardarTask.isEnabled = true
             botonGuardarTask.backgroundColor = .clear
+            fondoBotonGuardar.image = #imageLiteral(resourceName: "window_button")
             botonGuardarTask.setTitleColor(.black, for: .normal)
+        } else {
+            textoTip.isHidden = false
         }
         
         return false
@@ -502,44 +577,50 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @IBAction func botonAceptarPulsado(_ sender: Any) {
         
-        textoTituloTarea.text = ""
-        tituloTask = ""
-        botonGuardarTask.isEnabled = false
-        botonGuardarTask.backgroundColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 255/255)
-        botonGuardarTask.setTitleColor(.darkGray, for: .normal)
+        if verificarComponentes() {
         
-        botonDificultadFacil.animate(withGIFNamed: "dificultad_facil.gif")
-        botonDificultadNormal.stopAnimatingGIF()
-        botonDificultadNormal.image = #imageLiteral(resourceName: "dificultad_normal_desactivado")
-        botonDificultadDificil.stopAnimatingGIF()
-        botonDificultadDificil.image = #imageLiteral(resourceName: "dificultad_dificil_desactivado")
-        dificultad = TaskDifficulty.easy
-        botonPrioridadBaja.animate(withGIFNamed: "prioridad_baja_star.gif")
-        botonPrioridadMedia.stopAnimatingGIF()
-        botonPrioridadMedia.image = #imageLiteral(resourceName: "prioridad_media_star_desactivado")
-        botonPrioridadAlta.stopAnimatingGIF()
-        botonPrioridadAlta.image = #imageLiteral(resourceName: "prioridad_alta_star_desactivado")
-        prioridad = TaskPriority.low
-        
-        //Preparamos y lanzamos la animcacion que muestra la vista
-        
-        let panelFondo = UIView(frame: self.view.frame)
-        panelFondo.backgroundColor = .black
-        panelFondo.alpha = 0
-        panelFondo.tag = 100
-        
-        self.view.addSubview(panelFondo)
-        self.view.bringSubview(toFront: panelFondo)
-        self.view.bringSubview(toFront: viewGuardarTarea)
-        
-        viewGuardarTarea.isHidden = false
-        viewGuardarTarea.alpha = 0
-        viewGuardarTarea.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-        
-        UIView.animate(withDuration: 0.25) {
-            panelFondo.alpha = 0.6
-            self.viewGuardarTarea.transform = CGAffineTransform.identity
-            self.viewGuardarTarea.alpha = 1
+            textoTituloTarea.text = ""
+            tituloTask = ""
+            botonGuardarTask.isEnabled = false
+            fondoBotonGuardar.image = #imageLiteral(resourceName: "window_button_desactivado")
+            //botonGuardarTask.backgroundColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 255/255)
+            botonGuardarTask.setTitleColor(.darkGray, for: .normal)
+            
+            botonDificultadFacil.image = #imageLiteral(resourceName: "dificultad_facil_color")
+            //botonDificultadFacil.animate(withGIFNamed: "dificultad_facil.gif")
+            botonDificultadNormal.stopAnimatingGIF()
+            botonDificultadNormal.image = #imageLiteral(resourceName: "dificultad_normal_desactivado")
+            botonDificultadDificil.stopAnimatingGIF()
+            botonDificultadDificil.image = #imageLiteral(resourceName: "dificultad_dificil_desactivado")
+            dificultad = TaskDifficulty.easy
+            botonPrioridadBaja.image = #imageLiteral(resourceName: "prioridad_baja_star_color")
+            botonPrioridadMedia.stopAnimatingGIF()
+            botonPrioridadMedia.image = #imageLiteral(resourceName: "prioridad_media_star_desactivado")
+            botonPrioridadAlta.stopAnimatingGIF()
+            botonPrioridadAlta.image = #imageLiteral(resourceName: "prioridad_alta_star_desactivado")
+            prioridad = TaskPriority.low
+            
+            //Preparamos y lanzamos la animcacion que muestra la vista
+            
+            let panelFondo = UIView(frame: self.view.frame)
+            panelFondo.backgroundColor = .black
+            panelFondo.alpha = 0
+            panelFondo.tag = 100
+            
+            self.view.addSubview(panelFondo)
+            self.view.bringSubview(toFront: panelFondo)
+            self.view.bringSubview(toFront: viewGuardarTarea)
+            
+            viewGuardarTarea.isHidden = false
+            viewGuardarTarea.alpha = 0
+            viewGuardarTarea.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            
+            UIView.animate(withDuration: 0.25) {
+                panelFondo.alpha = 0.6
+                self.viewGuardarTarea.transform = CGAffineTransform.identity
+                self.viewGuardarTarea.alpha = 1
+            }
+            
         }
         
     }
@@ -566,6 +647,52 @@ class GameTaskViewController: UIViewController, UITableViewDataSource, UITableVi
         cerrarVentanaGuardarTarea(sender)
         self.performSegue(withIdentifier: "volverPantallaJuegoNuevoJuegoTransicion", sender: self)
         //dismiss(animated: true, completion: nil)
+        
+    }
+    
+    func verificarComponentes() -> Bool {
+        
+        if listaComponentesTask.count == 0 {
+            let alertVC = UIAlertController(title: "Atencion", message: "Debe haber al menos un componente en la tarea a crear", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+            alertVC.addAction(okAction)
+            self.present(alertVC, animated: true, completion: nil)
+            return false
+        }
+        
+        var componentesCorrectos = true
+        for componente in listaComponentesTask {
+            switch componente.type {
+            case .text:
+                if (componente as! TaskComponentText).texto == "" {
+                    componentesCorrectos = false
+                }
+            case .images:
+                if (componente as! TaskComponentImages).listaImagenes.count == 0 {
+                    componentesCorrectos = false
+                }
+            case .url:
+                if (componente as! TaskComponentURL).url == "" {
+                    componentesCorrectos = false
+                }
+            case .counter:
+                if (componente as! TaskComponentCounter).descripcion == "" || (componente as! TaskComponentCounter).maxElements == 0 {
+                    componentesCorrectos = false
+                }
+            default:
+                return false
+            }
+        }
+        
+        if !componentesCorrectos {
+            let alertVC = UIAlertController(title: "Atencion", message: "En alguno de los componentes insertados no se han establecido sus propiedades correctamente. Si es texto verifique que se ha introducido algun texto, si son imagenes que se ha seleccionado alguna imagen, si son enlaces que se ha verificado realmente algun enlace y si es un contador que posee descripcion y un numero de elementos mayor a 0", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+            alertVC.addAction(okAction)
+            self.present(alertVC, animated: true, completion: nil)
+            return false
+        }
+        
+        return true
         
     }
     

@@ -101,7 +101,7 @@ class GameTaskTableViewCell: UITableViewCell {
         
         if isIphone {
             viewTextoTop.constant = 5
-            viewTextoLeading.constant = 5
+            viewTextoLeading.constant = 8
         } else {
             viewTextoTop.constant = -5
             viewTextoLeading.constant = 10

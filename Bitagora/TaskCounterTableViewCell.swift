@@ -20,8 +20,7 @@ class TaskCounterTableViewCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet weak var textoCantidad: UILabel!
     @IBOutlet weak var botonMas: UIButton!
     @IBOutlet weak var botonMenos: UIButton!
-    @IBOutlet weak var backView2: UIView!
-    @IBOutlet weak var backView: UIView!
+    @IBOutlet weak var textoTip: UILabel!
     
     weak var delegate: TaskCounterTableViewCellDelegate?
     
@@ -44,23 +43,9 @@ class TaskCounterTableViewCell: UITableViewCell, UITextFieldDelegate {
         super.awakeFromNib()
         
         textoDescripcion.delegate = self
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(textDidChange(_:)), name: NSNotification.Name.UITextFieldTextDidChange, object: nil)
-        
-        let panel = UIView(frame: self.frame)
-        panel.w = panel.w * 2
-        panel.h = panel.h * 2
-        panel.x = panel.x + 10
-        panel.y = panel.y + 20
-        panel.backgroundColor = .black
-        
-        self.addSubview(panel)
-        self.sendSubview(toBack: panel)
-        
         self.backgroundColor = .clear
         
-        backView.addBorder(width: 2, color: .white)
-        backView2.addBorder(width: 2, color: .white)
+        NotificationCenter.default.addObserver(self, selector: #selector(textDidChange(_:)), name: NSNotification.Name.UITextFieldTextDidChange, object: nil)
         
     }
 
@@ -70,6 +55,16 @@ class TaskCounterTableViewCell: UITableViewCell, UITextFieldDelegate {
     
     func inicializarComponentes() {
         
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        textoTip.isHidden = true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if textoDescripcion.text == "" {
+            textoTip.isHidden = false
+        }
     }
     
     func textDidChange(_ textViewChanged: UITextView) {

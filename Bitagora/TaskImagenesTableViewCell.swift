@@ -35,21 +35,7 @@ class TaskImagenesTableViewCell: UITableViewCell, UIImagePickerControllerDelegat
         
         super.awakeFromNib()
         
-        let panel = UIView(frame: self.frame)
-        panel.w = panel.w * 5
-        panel.h = panel.h * 5
-        panel.x = panel.x + 10
-        panel.y = panel.y + 20
-        panel.backgroundColor = .black
-        
-        self.addSubview(panel)
-        self.sendSubview(toBack: panel)
-        
         self.backgroundColor = .clear
-        
-        /*textView.addBorder(width: 1, color: UIColor(red: 0/255, green: 0/255, blue: 173/255, alpha: 255/255))*/
-        backView.addBorder(width: 2, color: .white)
-        backView2.addBorder(width: 2, color: .white)
         
     }
 
@@ -61,8 +47,9 @@ class TaskImagenesTableViewCell: UITableViewCell, UIImagePickerControllerDelegat
         
         imagePicker.delegate = self
         
-        //imageSlideshow.addBorder(width: 1, color: .black)
-        imageSlideshow.backgroundColor = UIColor(red: 0/255, green: 0/255, blue: 173/255, alpha: 255/255)
+        //imageSlideshow.addBorder(width: 1, color: .gray)
+        //imageSlideshow.backgroundColor = UIColor(red: 0/255, green: 0/255, blue: 173/255, alpha: 255/255)
+        imageSlideshow.backgroundColor = .white
         imageSlideshow.slideshowInterval = 0
         imageSlideshow.pageControlPosition = PageControlPosition.insideScrollView
         imageSlideshow.pageControl.currentPageIndicatorTintColor = .white/*UIColor(red: 252/255, green: 2/255, blue: 84/255, alpha: 1)*/

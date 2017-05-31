@@ -874,6 +874,33 @@ extension UIImage {
     
 }
 
+extension UIImage {
+    
+    func resizableImageWithStretchingProperties(
+        
+        X: CGFloat, width widthProportion: CGFloat,
+        Y: CGFloat, height heightProportion: CGFloat) -> UIImage {
+        
+        let selfWidth = self.size.width
+        let selfHeight = self.size.height
+        
+        // insets along width
+        let leftCapInset = X*selfWidth*(1-widthProportion)
+        let rightCapInset = (1-X)*selfWidth*(1-widthProportion)
+        
+        // insets along height
+        let topCapInset = Y*selfHeight*(1-heightProportion)
+        let bottomCapInset = (1-Y)*selfHeight*(1-heightProportion)
+        
+        return self.resizableImage(
+            withCapInsets: UIEdgeInsets(top: topCapInset, left: leftCapInset,
+                         bottom: bottomCapInset, right: rightCapInset),
+            resizingMode: .stretch)
+        
+    }
+    
+}
+
 // MARK: - UIColor
 
 extension UIColor {

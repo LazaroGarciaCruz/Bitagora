@@ -15,6 +15,11 @@
 		5D381DF41EC2F20500FE979C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5D381DF21EC2F20500FE979C /* LaunchScreen.storyboard */; };
 		5D5AB18B1ED6D64D0018F4DB /* bitagora_data.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D5AB18A1ED6D64D0018F4DB /* bitagora_data.json */; };
 		5D5AB18D1ED6D6770018F4DB /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5AB18C1ED6D6770018F4DB /* DataManager.swift */; };
+		5D5AB18F1EDD48370018F4DB /* Pixelade.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5D5AB18E1EDD482C0018F4DB /* Pixelade.ttf */; };
+		5D5AB1911EDD576C0018F4DB /* stars_background.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5D5AB1901EDD576C0018F4DB /* stars_background.gif */; };
+		5D5AB1931EDD59AB0018F4DB /* stars_grey_background.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5D5AB1921EDD59AB0018F4DB /* stars_grey_background.gif */; };
+		5D5AB1951EDD5CBE0018F4DB /* stars_purple_background.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5D5AB1941EDD5CBE0018F4DB /* stars_purple_background.gif */; };
+		5D5AB1971EDD5DC90018F4DB /* stars_scroll_background.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5D5AB1961EDD5DC90018F4DB /* stars_scroll_background.gif */; };
 		5D690F231EC2F42100039E2C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5D690F221EC2F42100039E2C /* Main.storyboard */; };
 		5D690F2E1EC2F43A00039E2C /* orc_attack.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5D690F241EC2F43A00039E2C /* orc_attack.gif */; };
 		5D690F2F1EC2F43A00039E2C /* orc_attack_reverse.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5D690F251EC2F43A00039E2C /* orc_attack_reverse.gif */; };
@@ -141,6 +146,11 @@
 		5D381DF51EC2F20500FE979C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5D5AB18A1ED6D64D0018F4DB /* bitagora_data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = bitagora_data.json; sourceTree = "<group>"; };
 		5D5AB18C1ED6D6770018F4DB /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
+		5D5AB18E1EDD482C0018F4DB /* Pixelade.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Pixelade.ttf; sourceTree = "<group>"; };
+		5D5AB1901EDD576C0018F4DB /* stars_background.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = stars_background.gif; sourceTree = "<group>"; };
+		5D5AB1921EDD59AB0018F4DB /* stars_grey_background.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = stars_grey_background.gif; sourceTree = "<group>"; };
+		5D5AB1941EDD5CBE0018F4DB /* stars_purple_background.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = stars_purple_background.gif; sourceTree = "<group>"; };
+		5D5AB1961EDD5DC90018F4DB /* stars_scroll_background.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = stars_scroll_background.gif; sourceTree = "<group>"; };
 		5D690F221EC2F42100039E2C /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		5D690F241EC2F43A00039E2C /* orc_attack.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = orc_attack.gif; sourceTree = "<group>"; };
 		5D690F251EC2F43A00039E2C /* orc_attack_reverse.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = orc_attack_reverse.gif; sourceTree = "<group>"; };
@@ -323,6 +333,10 @@
 		5D690F211EC2F33C00039E2C /* GIF */ = {
 			isa = PBXGroup;
 			children = (
+				5D5AB1961EDD5DC90018F4DB /* stars_scroll_background.gif */,
+				5D5AB1941EDD5CBE0018F4DB /* stars_purple_background.gif */,
+				5D5AB1921EDD59AB0018F4DB /* stars_grey_background.gif */,
+				5D5AB1901EDD576C0018F4DB /* stars_background.gif */,
 				5DDAF2FE1EC73B8A0011E743 /* pixel_city.gif */,
 				5DDAF3001EC73C7A0011E743 /* pixel_city_rain.gif */,
 				5DDAF3021EC73CDD0011E743 /* pixel_city_destroyed.gif */,
@@ -426,6 +440,7 @@
 				5D69103E1EC2F4F300039E2C /* Pixeliza.ttf */,
 				5D69103F1EC2F4F300039E2C /* PixelRunes.ttf */,
 				5DAC9E841EC36B33003B36CA /* Pixellari.ttf */,
+				5D5AB18E1EDD482C0018F4DB /* Pixelade.ttf */,
 				5DAC19961ECD89D90075285A /* PerfectDOS.ttf */,
 			);
 			name = Fonts;
@@ -644,10 +659,12 @@
 				5DDAF30F1EC786000011E743 /* steampunk_character4.gif in Resources */,
 				5DDAF2DC1EC472370011E743 /* wizard_spell.gif in Resources */,
 				5D69102B1EC2F4BF00039E2C /* BackQHDPartWall.png in Resources */,
+				5D5AB1971EDD5DC90018F4DB /* stars_scroll_background.gif in Resources */,
 				5DDAF2E01EC480930011E743 /* wizard_spell_inverted.gif in Resources */,
 				5DAC9E851EC36C08003B36CA /* Pixellari.ttf in Resources */,
 				5DDAF2E81EC4ACB40011E743 /* explosion_simple.gif in Resources */,
 				5D80DCDE1EC8D6B10050A49B /* scanlines_iphone_thin.png in Resources */,
+				5D5AB1931EDD59AB0018F4DB /* stars_grey_background.gif in Resources */,
 				5D80DCF41EC9A42E0050A49B /* monitor_hardware2.gif in Resources */,
 				5D7A42341EC79BED00143FFF /* scanlines.png in Resources */,
 				5D80DD081EC9C54A0050A49B /* dificultad_dificil.gif in Resources */,
@@ -669,8 +686,10 @@
 				5D690F301EC2F43A00039E2C /* orc_idle.gif in Resources */,
 				5DDAF2FF1EC73B8A0011E743 /* pixel_city.gif in Resources */,
 				5D6910361EC2F4BF00039E2C /* BattlefrontBackground.png in Resources */,
+				5D5AB18F1EDD48370018F4DB /* Pixelade.ttf in Resources */,
 				5D80DD121EC9CEAB0050A49B /* prioridad_media.gif in Resources */,
 				5D690F321EC2F43A00039E2C /* switch_on.gif in Resources */,
+				5D5AB1951EDD5CBE0018F4DB /* stars_purple_background.gif in Resources */,
 				5D80DD141EC9D37C0050A49B /* dificultad_normal.gif in Resources */,
 				5D69102A1EC2F4BF00039E2C /* BackQHDFullWall.png in Resources */,
 				5DAC19971ECD89F60075285A /* PerfectDOS.ttf in Resources */,
@@ -692,6 +711,7 @@
 				5D6910321EC2F4BF00039E2C /* ZeldaLogoOriginal.png in Resources */,
 				5DDAF2EA1EC4AF230011E743 /* explosion_smoke.gif in Resources */,
 				5D80DCE61EC8E1420050A49B /* scanlines2.png in Resources */,
+				5D5AB1911EDD576C0018F4DB /* stars_background.gif in Resources */,
 				5DAC19741ECAD5CB0075285A /* Assets.xcassets in Resources */,
 				5D6910351EC2F4BF00039E2C /* BattlefrontLogo.png in Resources */,
 			);
