@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Gifu
 
 protocol GameTableViewCellDelegate: class {
     func borrarCelda(index: Int)
@@ -18,6 +19,7 @@ class GameTableViewCell: UITableViewCell {
     @IBOutlet weak var shadowMainView: GradientView!
     @IBOutlet weak var mainContentView: UIView!
     @IBOutlet weak var backgroundImage: UIImageView!
+    @IBOutlet weak var backgroundGifImage: GIFImageView!
     @IBOutlet weak var specularImage: UIImageView!
     @IBOutlet weak var logoImage: UIImageView!
     @IBOutlet weak var titleText: UILabel!
@@ -48,11 +50,11 @@ class GameTableViewCell: UITableViewCell {
         self.backgroundColor = UIColor.clear
         
         titleText.isHidden = true
-        if backgroundImage.image == nil && logoImage.image == nil {
+        if backgroundImage.image == nil && backgroundGifImage == nil && logoImage.image == nil {
             titleText.isHidden = false
-            titleText.textColor = .black
-            titleText.shadowColor = .clear
-        } else if backgroundImage.image != nil && logoImage.image == nil {
+            titleText.textColor = .white
+            titleText.shadowColor = .black
+        } else if (backgroundImage.image != nil || backgroundGifImage != nil) && logoImage.image == nil {
             titleText.isHidden = false
             titleText.textColor = .white
             titleText.shadowColor = .black

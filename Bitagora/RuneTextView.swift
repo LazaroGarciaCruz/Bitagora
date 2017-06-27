@@ -24,7 +24,7 @@ class RuneTextView: UIView {
             let label = GlowLabel(frame: CGRect(x: (CGFloat(numLabel) * width), y: 0, width: width, height: self.frame.height))
             label.text = texto[Int(numLabel)]
             label.textAlignment = .center
-            label.font = UIFont(name: "PixelRunes", size: 10)
+            label.font = UIFont(name: "PixelRunes", size: 8)
             label.textColor = .red
             label.numberOfLines = 0
             label.backgroundColor = .clear
@@ -86,7 +86,7 @@ class RuneTextView: UIView {
                                         UIView.animate(withDuration: self.animacionRapida ? tiempoAnimacionRapida : tiempoAnimacionLenta, delay: (self.animacionRapida ? delayAnimacionRapida : delayAnimacionLenta) * Double(index), usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: .curveLinear, animations: {
                                             label.setRotationY(y: 90)
                                         }, completion: {(exito) in
-                                            label.font = UIFont(name: "Pixel-Art", size: 10)
+                                            label.font = UIFont(name: "Pixel-Art", size: 8)
                                             label.textColor = .white
                                             label.shadowColor = UIColor.black
                                             label.shadowOffset = CGSize(width: 1, height: 1)

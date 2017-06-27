@@ -116,7 +116,7 @@ class DataMaganer {
      Este metodo lleva a cabo las tareas necesarias para almacenar 
      un nuevo juego en el sistema de archivos del JSON
      */
-    public func guardarJuego(titulo: String, coverImage: UIImage?, logoImage: UIImage?) -> Game {
+    public func guardarJuego(titulo: String, coverImage: UIImage?, logoImage: UIImage?, isCoverGif: Bool, gifData: Data?) -> Game {
         
         let tituloFinal = randomString(length: 10).uppercased()
         var rutaCover = ""
@@ -131,13 +131,24 @@ class DataMaganer {
 
             try FileManager.default.createDirectory(atPath: directorioJuego.path, withIntermediateDirectories: true, attributes: nil)
             
-            if let cover = coverImage {
-                if let data = UIImagePNGRepresentation(cover) {
-                    if FileManager.writeToDocumentsDirectory(data: data, relativePath: tituloFinal + "/" + "cover.png") {
-                        //rutaCover = FileManager.documentsDirectoryPathForResource(relativePath: tituloFinal + "/" + "cover.png")
-                        rutaCover = "cover.png"
+            if !isCoverGif {
+            
+                if let cover = coverImage {
+                    if let data = UIImagePNGRepresentation(cover) {
+                        if FileManager.writeToDocumentsDirectory(data: data, relativePath: tituloFinal + "/" + "cover.png") {
+                            //rutaCover = FileManager.documentsDirectoryPathForResource(relativePath: tituloFinal + "/" + "cover.png")
+                            rutaCover = "cover.png"
+                        }
                     }
                 }
+                
+            } else {
+                
+                if FileManager.writeToDocumentsDirectory(data: gifData!, relativePath: tituloFinal + "/" + "cover.gif") {
+                    //rutaCover = FileManager.documentsDirectoryPathForResource(relativePath: tituloFinal + "/" + "cover.png")
+                    rutaCover = "cover.gif"
+                }
+                
             }
             
             if let logo = logoImage {
@@ -415,6 +426,19 @@ class DataMaganer {
         
         let rutaImagen = FileManager.documentsDirectoryURL().appendingPathComponent(directorio).appendingPathComponent(imagen)
         return UIImage(contentsOfFile: rutaImagen.path)
+        
+    }
+    
+    /*
+     Este metodo devuelve el data de un gif almacenado en disco
+     */
+    func cargarDataGifAlmacenado(directorio: String, imagen: String) -> Data? {
+        
+        let rutaImagen = FileManager.documentsDirectoryURL().appendingPathComponent(directorio).appendingPathComponent(imagen)
+        
+        if let data = try? Data(contentsOf: rutaImagen) { return data }
+        
+        return nil
         
     }
     

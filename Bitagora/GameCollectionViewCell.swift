@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Gifu
 
 protocol GameCollectionViewCellDelegate: class {
     func borrarCelda(index: Int)
@@ -25,6 +26,7 @@ class GameCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var mainContentView: UIView!
     @IBOutlet weak var shadowMainView: GradientView!
     @IBOutlet weak var backgroundImage: UIImageView!
+    @IBOutlet weak var backgroundGifImage: GIFImageView!
     @IBOutlet weak var logoImage: UIImageView!
     @IBOutlet weak var specularImage: UIImageView!
     @IBOutlet weak var titleText: UILabel!
@@ -45,15 +47,16 @@ class GameCollectionViewCell: UICollectionViewCell {
         
         shadowMainView.setCornerRadius(radius: 5)
         backgroundImage.setCornerRadius(radius: 5)
+        backgroundGifImage.setCornerRadius(radius: 5)
         logoImage.setCornerRadius(radius: 5)
         specularImage.setCornerRadius(radius: 5)
         
         titleText.isHidden = true
-        if backgroundImage.image == nil && logoImage.image == nil {
+        if backgroundImage.image == nil && backgroundGifImage == nil && logoImage.image == nil {
             titleText.isHidden = false
-            titleText.textColor = .black
-            titleText.shadowColor = .clear
-        } else if backgroundImage.image != nil && logoImage.image == nil {
+            titleText.textColor = .white
+            titleText.shadowColor = .black
+        } else if (backgroundImage.image != nil || backgroundGifImage != nil) && logoImage.image == nil {
             titleText.isHidden = false
             titleText.textColor = .white
             titleText.shadowColor = .black

@@ -9,6 +9,7 @@
 import UIKit
 import Gifu
 import ImageSlideshow
+import PhotosUI
 
 public enum ScreenTouchPosition : Int {
     
@@ -47,9 +48,11 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
     @IBOutlet weak var botonLogoNuevoJuego: UIButton!
     @IBOutlet weak var botonCrearNuevoJuego: UIButton!
     @IBOutlet weak var coverPortraitMode: UIImageView!
+    @IBOutlet weak var coverGifPortraitMode: GIFImageView!
     @IBOutlet weak var logoPortraitMode: UIImageView!
     @IBOutlet weak var titlePortraitMode: UILabel!
     @IBOutlet weak var coverLandscapeMode: UIImageView!
+    @IBOutlet weak var coverGifLandscapeMode: GIFImageView!
     @IBOutlet weak var logoLandscapeMode: UIImageView!
     @IBOutlet weak var titleLandscapeMode: UILabel!
     
@@ -57,10 +60,12 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
     var isBuscandoCover = false
     var isImagenSeleccionada = false
     var isTituloSeleccionado = false
+    var isGifSeleccionado = false
     
     var nuevoJuegoTitulo = ""
     var nuevoJuegoCoverImage: UIImage?
     var nuevoJuegoLogoImage: UIImage?
+    var nuevoJuegoCoverGif: Data?
     
     //Variables para la gestion de datos
     
@@ -522,10 +527,16 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         nuevoJuegoTitulo = ""
         nuevoJuegoCoverImage = nil
         nuevoJuegoLogoImage = nil
+        nuevoJuegoCoverGif = nil
         
         isBuscandoCover = false
         isImagenSeleccionada = false
         isTituloSeleccionado = false
+        isGifSeleccionado = false
+        coverGifPortraitMode.stopAnimatingGIF()
+        coverGifPortraitMode.isHidden = true
+        coverGifLandscapeMode.stopAnimatingGIF()
+        coverGifLandscapeMode.isHidden = true
         
         //Preparamos y lanzamos la animcacion que muestra la vista
         
@@ -591,7 +602,7 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
     @IBAction func crearNuevoJuego(_ sender: Any) {
         
         ocultarPanelNuevoJuego(sender)
-        games.append(DataMaganer.sharedInstance.guardarJuego(titulo: nuevoJuegoTitulo, coverImage: nuevoJuegoCoverImage, logoImage: nuevoJuegoLogoImage))
+        games.append(DataMaganer.sharedInstance.guardarJuego(titulo: nuevoJuegoTitulo, coverImage: nuevoJuegoCoverImage, logoImage: nuevoJuegoLogoImage, isCoverGif: isGifSeleccionado, gifData: nuevoJuegoCoverGif))
         
         tableView.reloadData()
         collectionView.reloadData()
@@ -616,12 +627,48 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
+        //Con este codigo obtenemos la imagen de la url seleccionada
+        //la guardamos en forma de Data y comprobamos si el formato
+        //de la imagen a traves de extension de la biblia
+        
+        guard let imageURL = info[UIImagePickerControllerReferenceURL] as? URL else { return }
+        guard let asset = PHAsset.fetchAssets(withALAssetURLs: [imageURL], options: nil).lastObject else { return }
+            
+        let options = PHImageRequestOptions()
+        options.isSynchronous = true
+        options.isNetworkAccessAllowed = false
+        options.deliveryMode = .highQualityFormat
+        PHImageManager.default().requestImageData(for: asset, options: options) { data, uti, orientation, info in
+            guard let info = info else { return }
+            
+            if let error = info[PHImageErrorKey] as? Error {
+                print(error)
+                return
+            }
+            
+            if let isInCould = info[PHImageResultIsInCloudKey] as? Bool, isInCould {
+                return
+            }
+            
+            if (data as! NSData).imageFormat == .GIF {
+                self.coverGifPortraitMode.animate(withGIFData: data!)
+                self.coverGifLandscapeMode.animate(withGIFData: data!)
+                self.isGifSeleccionado = true
+                self.nuevoJuegoCoverGif = data
+                self.coverGifPortraitMode.isHidden = false
+                self.coverGifLandscapeMode.isHidden = false
+            }
+            
+        }
+        
         let chosenImage = info[UIImagePickerControllerOriginalImage] as! UIImage
         
         if isBuscandoCover {
             
-            nuevoJuegoCoverImage = chosenImage
-            coverPortraitMode.image = chosenImage
+            if !isGifSeleccionado {
+                nuevoJuegoCoverImage = chosenImage
+                coverPortraitMode.image = chosenImage
+            }
             coverLandscapeMode.image = chosenImage
             
             if !isImagenSeleccionada {
@@ -700,10 +747,10 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         if (tituloNuevoJuego.text?.characters.count)! > 0 {
             titlePortraitMode.text = tituloNuevoJuego.text
             titleLandscapeMode.text = tituloNuevoJuego.text
-            titlePortraitMode.textColor = .black
-            titlePortraitMode.shadowColor = .clear
-            titleLandscapeMode.textColor = .black
-            titleLandscapeMode.shadowColor = .clear
+            titlePortraitMode.textColor = .white
+            titlePortraitMode.shadowColor = .black
+            titleLandscapeMode.textColor = .white
+            titleLandscapeMode.shadowColor = .black
             isTituloSeleccionado = true
             activarBotonCrearNuevoJuego()
         } else {
@@ -731,9 +778,9 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
             titlePortraitMode.text = tituloNuevoJuego.text
             titleLandscapeMode.text = tituloNuevoJuego.text
             titlePortraitMode.textColor = .black
-            titlePortraitMode.shadowColor = .clear
+            titlePortraitMode.shadowColor = .white
             titleLandscapeMode.textColor = .black
-            titleLandscapeMode.shadowColor = .clear
+            titleLandscapeMode.shadowColor = .white
             isTituloSeleccionado = true
             activarBotonCrearNuevoJuego()
         } else {
@@ -827,7 +874,14 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         
         let juego = games[indexPath.row]
         cell.logoImage.image = juego.logoImage
-        cell.backgroundImage.image = juego.coverImage
+        if juego.isCoverGif {
+            cell.backgroundGifImage.isHidden = false
+            cell.backgroundGifImage.animate(withGIFData: juego.coverGifData!)
+        } else {
+            cell.backgroundGifImage.stopAnimatingGIF()
+            cell.backgroundGifImage.isHidden = true
+            cell.backgroundImage.image = juego.coverImage
+        }
         cell.titleText.text = juego.title
         cell.indexPath = indexPath
         cell.delegate = self
@@ -849,11 +903,11 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
             celdaSombraDerecha?.constant = 15
             celdaSombraIzquierda?.constant = 15
             celdaSombraArriba?.constant = 0
-            celdaSombraAbajo?.constant = 0
-            celdaCoverDerecha?.constant = 35
-            celdaCoverIzquierda?.constant = 35
-            celdaCoverArriba?.constant = 20
-            celdaCoverAbajo?.constant = 25
+            celdaSombraAbajo?.constant = 3
+            celdaCoverDerecha?.constant = 30
+            celdaCoverIzquierda?.constant = 30
+            celdaCoverArriba?.constant = 15
+            celdaCoverAbajo?.constant = 21
         } else {
             celdaSombraDerecha?.constant = 30
             celdaSombraIzquierda?.constant = 30
@@ -875,7 +929,7 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
     */
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        let totalFilas: CGFloat = 5.5
+        let totalFilas: CGFloat = 4.5
         return UIScreen.main.bounds.height / totalFilas/*(isIphone ? totalFilas + 2 : totalFilas + 2)*/
         
     }
@@ -946,7 +1000,14 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
         
         let juego = games[indexPath.row]
         cell.logoImage.image = juego.logoImage
-        cell.backgroundImage.image = juego.coverImage
+        if juego.isCoverGif {
+            cell.backgroundGifImage.isHidden = false
+            cell.backgroundGifImage.animate(withGIFData: juego.coverGifData!)
+        } else {
+            cell.backgroundGifImage.stopAnimatingGIF()
+            cell.backgroundGifImage.isHidden = true
+            cell.backgroundImage.image = juego.coverImage
+        }
         cell.titleText.text = juego.title
         cell.indexPath = indexPath
         cell.delegate = self
@@ -968,10 +1029,10 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
             celdaSombraIzquierda?.constant = 0
             celdaSombraArriba?.constant = 0
             celdaSombraAbajo?.constant = 0
-            celdaCoverDerecha?.constant = 20
-            celdaCoverIzquierda?.constant = 20
-            celdaCoverArriba?.constant = 20
-            celdaCoverAbajo?.constant = 25
+            celdaCoverDerecha?.constant = 15
+            celdaCoverIzquierda?.constant = 15
+            celdaCoverArriba?.constant = 15
+            celdaCoverAbajo?.constant = 20
         } else {
             celdaSombraDerecha?.constant = 0
             celdaSombraIzquierda?.constant = 0

@@ -20,6 +20,8 @@ public class Game {
     var title: String = ""
     var logoImage: UIImage?
     var coverImage: UIImage?
+    var coverGifData: Data?
+    var isCoverGif = false
     var taskLista: Array<GameTask> = []
     
     init() {}
@@ -37,8 +39,16 @@ public class Game {
         self.id = id
         self.title = titulo
         
-        if let imageAux = DataMaganer.sharedInstance.cargarImagenAlmacenada(directorio: id, imagen: cover) {
-            coverImage = imageAux
+        if cover.contains(".gif") {
+            isCoverGif = true
+            if let dataAux = DataMaganer.sharedInstance.cargarDataGifAlmacenado(directorio: id, imagen: cover) {
+                coverGifData = dataAux
+            }
+        } else {
+            isCoverGif = false
+            if let imageAux = DataMaganer.sharedInstance.cargarImagenAlmacenada(directorio: id, imagen: cover) {
+                coverImage = imageAux
+            }
         }
         
         if let imageAux = DataMaganer.sharedInstance.cargarImagenAlmacenada(directorio: id, imagen: logo) {

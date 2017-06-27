@@ -102,7 +102,7 @@ import UIKit
     private func fontToFitHeight() -> UIFont {
         
         var minFontSize: CGFloat = 1 // CGFloat 18
-        var maxFontSize: CGFloat = 35     // CGFloat 67
+        var maxFontSize: CGFloat = 25     // CGFloat 67
         var fontSizeAverage: CGFloat = 0
         var textAndLabelHeightDiff: CGFloat = 0
         
