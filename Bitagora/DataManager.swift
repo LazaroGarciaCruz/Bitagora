@@ -201,7 +201,20 @@ class DataMaganer {
             if (json?["juegos"].exists())! {
                 for (key, value):(String, JSON) in (json?["juegos"])! {
                     if value["id"].string == juego.id {
-                        json?["juegos"].arrayObject?.remove(at: Int(key)!)
+                        if json?["juegos"].arrayObject?.count == 1 {
+                            //Todo este movidon de aqui tengo que hacerlo porque
+                            //por alguna razon cuando queda solo un elemento en el
+                            //array el "remove(at:)" no hace nada
+                            let update: JSON = JSON(["juegos": []])
+                            do{
+                                json?.dictionaryObject?.removeValue(forKey: "juegos")
+                                try json?.merge(with: update)
+                            } catch let error as NSError {
+                                print("Error: \(error.debugDescription)")
+                            }
+                        } else {
+                            json?["juegos"].arrayObject?.remove(at: Int(key)!)
+                        }
                     }
                 }
             }

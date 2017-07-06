@@ -177,7 +177,7 @@
                                                                     <rect key="frame" x="0.0" y="0.0" width="231" height="243"/>
                                                                 </imageView>
                                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="zelda_logo_light.png" translatesAutoresizingMaskIntoConstraints="NO" id="Rek-gK-HjJ">
-                                                                    <rect key="frame" x="8" y="8" width="215" height="227"/>
+                                                                    <rect key="frame" x="16" y="16" width="199" height="211"/>
                                                                 </imageView>
                                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="wall_nail" translatesAutoresizingMaskIntoConstraints="NO" id="Lrv-VA-jlm">
                                                                     <rect key="frame" x="-5" y="-5" width="23" height="19.5"/>
@@ -209,8 +209,8 @@
                                                                 <constraint firstAttribute="trailing" secondItem="iOj-li-yyu" secondAttribute="trailing" id="5wC-FU-mfo"/>
                                                                 <constraint firstItem="zvv-7A-OSi" firstAttribute="height" secondItem="PEm-4V-mJc" secondAttribute="height" multiplier="0.08" id="6Vg-wA-06u"/>
                                                                 <constraint firstItem="zvv-7A-OSi" firstAttribute="top" secondItem="PEm-4V-mJc" secondAttribute="top" constant="-5" id="Bbr-rp-NGm"/>
-                                                                <constraint firstAttribute="trailing" secondItem="Rek-gK-HjJ" secondAttribute="trailing" constant="8" id="DCK-oi-CVP"/>
-                                                                <constraint firstAttribute="bottom" secondItem="Rek-gK-HjJ" secondAttribute="bottom" constant="8" id="Ebd-yj-FbA"/>
+                                                                <constraint firstAttribute="trailing" secondItem="Rek-gK-HjJ" secondAttribute="trailing" constant="16" id="DCK-oi-CVP"/>
+                                                                <constraint firstAttribute="bottom" secondItem="Rek-gK-HjJ" secondAttribute="bottom" constant="16" id="Ebd-yj-FbA"/>
                                                                 <constraint firstItem="Lrv-VA-jlm" firstAttribute="leading" secondItem="PEm-4V-mJc" secondAttribute="leading" constant="-5" id="FAA-KU-FmO"/>
                                                                 <constraint firstItem="iOj-li-yyu" firstAttribute="top" secondItem="PEm-4V-mJc" secondAttribute="top" id="G8e-Oy-VKy"/>
                                                                 <constraint firstAttribute="bottom" secondItem="iOj-li-yyu" secondAttribute="bottom" id="HTv-XI-hKu"/>
@@ -231,8 +231,8 @@
                                                                 <constraint firstItem="f1z-hy-daX" firstAttribute="top" secondItem="PEm-4V-mJc" secondAttribute="top" id="XrR-QK-ywv"/>
                                                                 <constraint firstItem="cRZ-2k-Rf8" firstAttribute="top" secondItem="PEm-4V-mJc" secondAttribute="top" id="au1-9O-olq"/>
                                                                 <constraint firstItem="Ded-vd-xWG" firstAttribute="width" secondItem="PEm-4V-mJc" secondAttribute="width" multiplier="0.1" id="ciU-Mt-1R9"/>
-                                                                <constraint firstItem="Rek-gK-HjJ" firstAttribute="top" secondItem="PEm-4V-mJc" secondAttribute="top" constant="8" id="eIe-Mh-eJx"/>
-                                                                <constraint firstItem="Rek-gK-HjJ" firstAttribute="leading" secondItem="PEm-4V-mJc" secondAttribute="leading" constant="8" id="fPI-BZ-1U2"/>
+                                                                <constraint firstItem="Rek-gK-HjJ" firstAttribute="top" secondItem="PEm-4V-mJc" secondAttribute="top" constant="16" id="eIe-Mh-eJx"/>
+                                                                <constraint firstItem="Rek-gK-HjJ" firstAttribute="leading" secondItem="PEm-4V-mJc" secondAttribute="leading" constant="16" id="fPI-BZ-1U2"/>
                                                                 <constraint firstAttribute="bottom" secondItem="kzT-hR-UeQ" secondAttribute="bottom" constant="-5" id="fiZ-sS-bxF"/>
                                                                 <constraint firstItem="Lrv-VA-jlm" firstAttribute="height" secondItem="PEm-4V-mJc" secondAttribute="height" multiplier="0.08" id="p02-h2-KRb"/>
                                                                 <constraint firstItem="kzT-hR-UeQ" firstAttribute="width" secondItem="PEm-4V-mJc" secondAttribute="width" multiplier="0.1" id="saI-f8-icG"/>
@@ -2400,7 +2400,7 @@
                                                                             </connections>
                                                                         </button>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iBu-ZM-jdq">
-                                                                            <rect key="frame" x="25" y="5" width="30" height="18.5"/>
+                                                                            <rect key="frame" x="25" y="4.5" width="30" height="18.5"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="width" constant="30" id="E74-4c-oWH"/>
                                                                             </constraints>

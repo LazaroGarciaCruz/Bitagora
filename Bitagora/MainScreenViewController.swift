@@ -92,12 +92,23 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
             isIphone = true
         }
         
+        //Con este observador se ejecuta el metodo reanudarAnimacionCabecera()
+        //cuando la aplicacion se vuelve activa, entre ello, cuando sale de
+        //background al cambiar entre aplicaciones
+        NotificationCenter.default.addObserver(self, selector: #selector(reanudadAnimacionCabecera), name: .UIApplicationWillEnterForeground, object: nil)
+        
         cargarJuegos()
         
         inicializarViewControler()
         prepararCollectionView()
         prepararTabla()
         
+    }
+    
+    func reanudadAnimacionCabecera() {
+        if aplicacionIniciada {
+            viewScrolling.resumeBackground()
+        }
     }
     
     /*
@@ -929,7 +940,7 @@ class MainScreenViewController: UIViewController, UIGestureRecognizerDelegate, U
     */
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        let totalFilas: CGFloat = 4.5
+        let totalFilas: CGFloat = 5
         return UIScreen.main.bounds.height / totalFilas/*(isIphone ? totalFilas + 2 : totalFilas + 2)*/
         
     }
